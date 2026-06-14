@@ -93,21 +93,7 @@ flowchart LR
 
 ---
 
-## 4. Projektstruktur
-
-```text
-├── data/               # Beispiel-Frames oder kleine Video-Sequenzen
-├── models/             # Exportierte ONNX- / TensorRT-.engine-Dateien
-├── notebooks/          # Jupyter Notebook für Datenanalyse & Score-Berechnung
-├── src/                # Python-Skripte (Jetson Nano, Display-Steuerung)
-├── paper/              # 4-seitiges Paper (PDF & LaTeX-Sourcen)
-├── README.md           # Projektdokumentation, Hardware-Setup, Score-Formel
-└── requirements.txt    # Abhängigkeiten (ultralytics, opencv, etc.)
-```
-
----
-
-## 5. Edge-Deployment (NVIDIA Jetson Nano)
+## 4. Edge-Deployment (NVIDIA Jetson Nano)
 
 Das Scoring-Modell läuft als **Edge-AI-System** in Echtzeit auf einem NVIDIA Jetson Nano und
 zeigt den aktuellen Score während der Fahrt auf einem kleinen Display an.
@@ -160,7 +146,7 @@ cv2.destroyAllWindows()
 
 ---
 
-## 6. Installation & Nutzung
+## 5. Installation & Nutzung
 
 ```bash
 # Repository klonen
@@ -176,7 +162,7 @@ jupyter lab notebooks/
 
 ---
 
-## 7. Evaluation
+## 6. Evaluation
 
 Die Auswertung vergleicht zwei kontrastierende Streckenabschnitte aus dem Videomaterial
 (z. B. **Fahrt durch den Wald** vs. **Fahrt an einer Hauptstraße**):
@@ -190,7 +176,7 @@ Oberflächen-Klassifikation Accuracy, F1-Score und Confusion Matrix.
 
 ---
 
-## 8. Aufbau des Papers (4 Seiten)
+## 7. Aufbau des Papers (4 Seiten)
 
 1. **Abstract** – Kurzfassung der Methodik zur automatisierten Bewertung von Radinfrastruktur
    mittels Egocentric Vision.
@@ -203,7 +189,7 @@ Oberflächen-Klassifikation Accuracy, F1-Score und Confusion Matrix.
 
 ---
 
-## 9. Limitationen
+## 8. Limitationen
 
 - Grün- und Himmelserkennung ist abhängig von Wetter, Tageszeit und Belichtung.
 - HSV-Schwellwerte sind szenenabhängig und müssen ggf. kalibriert werden.
@@ -212,7 +198,7 @@ Oberflächen-Klassifikation Accuracy, F1-Score und Confusion Matrix.
 
 ---
 
-## 10. Tech-Stack
+## 9. Tech-Stack
 
 - **Computer Vision:** Ultralytics YOLOv8/YOLOv10, OpenCV
 - **Deep Learning:** PyTorch, ResNet/EfficientNet (Oberflächen-Klassifikation)
@@ -221,9 +207,10 @@ Oberflächen-Klassifikation Accuracy, F1-Score und Confusion Matrix.
 
 ---
 
-## 11. Ressourcen
+## 10. Ressourcen
 
 - 📊 Miro-Mindmap: [Projekt-Board](https://miro.com/welcomeonboard/M0ozRVhXNE50ZEE2cXJpVy9mZzk1S1ZHeVFEcDNETTY0UllyMlIvenh5NEZtTVdSMGpHT0lqQnRTRlE0NjJnRm02MUltZjdtNGxLYTl1QUpvOVU5TlJXdFFJSThCak1FR00yVXRPaVhEcEd1aW03NjNqYit3OGpqRGxjbzl4eUhBS2NFMDFkcUNFSnM0d3FEN050ekl3PT0hdjE=?share_link_id=549246225146)
+- 📦 Datensatz: [Google Drive](https://drive.google.com/drive/folders/1cMV4_znMxJ1V4L5ZnJUUq9dNIdBuOYaO?usp=sharing)
 
 ---
 
