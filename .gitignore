@@ -1,0 +1,32 @@
+# --- Virtuelle Umgebungen (nicht einchecken, plattformabhängig) ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Python-Artefakte ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Modelle / Gewichte / Videos (große Dateien) ---
+*.engine
+*.pt
+*.onnx
+*.mp4
+*.MP4
+*.mov
+*.MOV
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

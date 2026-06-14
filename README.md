@@ -148,17 +148,61 @@ cv2.destroyAllWindows()
 
 ## 5. Installation & Nutzung
 
+### 5.1 Repository klonen
+
 ```bash
-# Repository klonen
 git clone https://github.com/<username>/computer_vision_bikeability_score.git
 cd computer_vision_bikeability_score
+```
+
+### 5.2 Virtuelle Umgebung (venv) anlegen
+
+Damit alle Entwickler:innen mit denselben Paket-Versionen arbeiten, wird pro Person eine
+**lokale** virtuelle Umgebung erstellt. Der `.venv/`-Ordner wird **nicht** ins Repository
+eingecheckt (siehe `.gitignore`) – committet wird nur die `requirements.txt`.
+
+Empfohlene Python-Version: **3.10+**.
+
+**Windows (PowerShell):**
+
+```powershell
+# venv erstellen
+python -m venv .venv
+
+# venv aktivieren
+.venv\Scripts\Activate.ps1
 
 # Abhängigkeiten installieren
 pip install -r requirements.txt
+```
 
-# Notebook starten
+> Falls die Aktivierung mit einem Ausführungsrichtlinien-Fehler abbricht, einmalig ausführen:
+> `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
+
+**macOS / Linux (bash/zsh):**
+
+```bash
+# venv erstellen
+python3 -m venv .venv
+
+# venv aktivieren
+source .venv/bin/activate
+
+# Abhängigkeiten installieren
+pip install -r requirements.txt
+```
+
+Zum Deaktivieren der Umgebung jederzeit `deactivate` ausführen.
+
+### 5.3 Notebook starten
+
+```bash
 jupyter lab notebooks/
 ```
+
+> **Hinweis zur Reproduzierbarkeit:** Neue Pakete bitte mit fixierter Version in die
+> `requirements.txt` eintragen (z. B. `numpy==1.26.4`) und committen. Den `.venv/`-Ordner
+> niemals einchecken – er ist plattformabhängig und nicht portabel.
 
 ---
 
