@@ -1,0 +1,71 @@
+{
+    // LaTeX Workshop ohne latexmk/Perl bauen (MiKTeX).
+    // Nutzt direkt pdflatex + bibtex -> pdflatex -> pdflatex.
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "pdflatex -> bibtex -> pdflatex*2",
+            "tools": [
+                "pdflatex",
+                "bibtex",
+                "pdflatex",
+                "pdflatex"
+            ]
+        },
+        {
+            "name": "pdflatex only",
+            "tools": [
+                "pdflatex"
+            ]
+        }
+    ],
+    "latex-workshop.latex.tools": [
+        {
+            "name": "pdflatex",
+            "command": "pdflatex",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "%DOC%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": [
+                "%DOCFILE%"
+            ],
+            "env": {}
+        }
+    ],
+    // Standard-Recipe (das erste in der Liste) erzwingen.
+    "latex-workshop.latex.recipe.default": "first",
+    // Hauptdokument festlegen, damit der Build immer dokumentation.tex nutzt.
+    "latex-workshop.latex.rootFile": "paper/dokumentation.tex",
+    // Hilfsdateien beim Clean entfernen (kein latexmk -c noetig).
+    "latex-workshop.latex.clean.fileTypes": [
+        "*.aux",
+        "*.bbl",
+        "*.blg",
+        "*.idx",
+        "*.ind",
+        "*.lof",
+        "*.lot",
+        "*.out",
+        "*.toc",
+        "*.acn",
+        "*.acr",
+        "*.alg",
+        "*.glg",
+        "*.glo",
+        "*.gls",
+        "*.fls",
+        "*.log",
+        "*.fdb_latexmk",
+        "*.snm",
+        "*.nav",
+        "*.synctex.gz"
+    ],
+    "latex-workshop.latex.autoBuild.run": "onSave"
+}

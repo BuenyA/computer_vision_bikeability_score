@@ -1,0 +1,91 @@
+%%**************************************************************
+%% IEEE conference paper template (two-column).
+%% Citation style follows the IEEE Xplore / IEEEtran guidelines.
+%%**************************************************************
+\documentclass[conference,a4paper,10pt]{IEEEtran}
+
+\IEEEoverridecommandlockouts
+
+% --- Encoding & language ----------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+% --- Math, tables, units ----------------------------------------------------
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{siunitx}
+\sisetup{
+    group-separator   = {,},
+    output-decimal-marker = {.},
+    detect-all
+}
+
+% --- Graphics & links -------------------------------------------------------
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue]{hyperref}
+
+% --- Placeholder text (Lorem Ipsum) -----------------------------------------
+\usepackage{lipsum}
+
+% --- Convenience macros -----------------------------------------------------
+\usepackage{textcomp}
+\newcommand{\act}[1]{\textit{#1}}
+
+% --- A bit more breathing room around the IEEE headings ----------------------
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+    {2.6ex \@plus 1ex \@minus .2ex}%
+    {1.4ex \@plus .2ex}%
+    {\normalfont\normalsize\centering\scshape}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+    {2.0ex \@plus 1ex \@minus .2ex}%
+    {1.0ex \@plus .2ex}%
+    {\normalfont\normalsize\itshape}}
+\makeatother
+
+% --- Document ---------------------------------------------------------------
+\begin{document}
+
+\title{A Computer-Vision Approach to Automated\\
+\large Bikeability Scoring from Street-Level Imagery}
+
+\author{%
+    \IEEEauthorblockN{%
+        \parbox[t]{0.3\textwidth}{\centering
+            B\"unyamin Aydemir\\
+            DHBW CAS\\
+            M.Sc.\ Data Science and AI\\
+            bunyamin.aydemir@example.com}\hfill
+        \parbox[t]{0.3\textwidth}{\centering
+            Gonzalo Guerrero Salazar\\
+            DHBW CAS\\
+            M.Sc.\ Data Science and AI\\
+            gonzalo.guerrero@example.com}\hfill
+        \parbox[t]{0.3\textwidth}{\centering
+            Hendrick Fischer\\
+            DHBW CAS\\
+            M.Sc.\ Data Science and AI\\
+            hendrick.fischer@example.com}%
+    }%
+}
+
+\maketitle
+
+\input{ads/abstract}
+
+\begin{IEEEkeywords}
+computer vision, bikeability, street-level imagery, deep learning,
+urban mobility, semantic segmentation
+\end{IEEEkeywords}
+
+\input{content/01kapitel}
+
+% --- Bibliography (IEEE Xplore style) ---------------------------------------
+\bibliographystyle{IEEEtran}
+\bibliography{ArbeitBib}
+
+\end{document}

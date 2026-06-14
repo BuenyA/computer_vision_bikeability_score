@@ -18,6 +18,7 @@ Klassische Bikeability-Indizes basieren auf manuellen Erhebungen oder Geodaten. 
 untersucht, ob sich die **Attraktivität einer Fahrradstrecke automatisiert aus der
 Ich-Perspektive (Egocentric Vision)** ableiten lässt.
 
+
 **Zielgröße:** Eine kontinuierliche Variable – der *Bikeability-Score* $A \in [0, 100]$ –
 pro Streckensegment (zeitbasiert: 10 s, oder distanzbasiert: 100 m).
 
@@ -39,6 +40,8 @@ definierte, messbare Merkmale.
 
 > Bei z. B. 30 fps und ~20 km/h entspricht ein 100-m-Abschnitt ca. **540 Frames**, die zu
 > einem Feature-Vektor aggregiert werden.
+
+📦 **Bereits erstellter Datensatz:** [Google Drive](https://drive.google.com/drive/folders/1cMV4_znMxJ1V4L5ZnJUUq9dNIdBuOYaO?usp=sharing)
 
 ---
 
