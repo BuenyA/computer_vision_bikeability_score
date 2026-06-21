@@ -30,3 +30,8 @@ dist/
 .idea/
 .DS_Store
 Thumbs.db
+
+# --- Frames: nur beispiel_dji_0380 einchecken, alle anderen ignorieren ---
+dataset/frames/*
+!dataset/frames/beispiel_dji_0380/
+!dataset/frames/beispiel_dji_0380/**
