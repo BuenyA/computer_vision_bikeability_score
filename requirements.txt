@@ -1,1 +1,5 @@
+imageio-ffmpeg
+opencv-python
+numpy
+matplotlib
 

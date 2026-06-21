@@ -1,0 +1,7 @@
+# Diesen Ordner in Git behalten, aber den gesamten Inhalt ignorieren.
+# So koennen andere ihre Roh-Videos hier ablegen, ohne dass sie
+# versehentlich ins Repository hochgeladen werden.
+
+*
+
+!.gitignore
