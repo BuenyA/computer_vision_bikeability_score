@@ -3,4 +3,7 @@ opencv-python
 numpy
 matplotlib
 ultralytics
+torch
+transformers
+pillow
 
