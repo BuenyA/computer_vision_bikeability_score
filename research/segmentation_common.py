@@ -16,7 +16,7 @@ Design notes
   are area/"stuff" classes (semantic masks); **traffic** objects
   (traffic_light/car/person/bicycle_rider) are countable "things" better produced
   by detection (YOLO-World / instance seg) and rasterized into the mask.
-* `industry`/`city`/`open_field`/`forest` can additionally be reinforced by
+* `city`/`open_field`/`forest` can additionally be reinforced by
   per-frame CLIP scene attributes in the zero-shot notebook.
 * Label maps are keyed by the *readable source class name* rather than a numeric
   id, because the numeric ordering differs between dataset versions. Notebook B
@@ -41,7 +41,6 @@ TAXONOMY: list[tuple[str, tuple[int, int, int]]] = [
     ("forest",           ( 30, 120,  40)),
     ("open_field",       (180, 220, 100)),
     ("water",            (  0, 130, 180)),
-    ("industry",         ( 90,  40,  40)),
     ("city",             (130, 130, 130)),
     # --- traffic object detection ---
     ("traffic_light",    (250, 170,  30)),
@@ -58,7 +57,7 @@ VOID_ID: int = 255
 # Three task groups (mirrors how the features feed the score / who owns each path).
 CATEGORIES: dict[str, list[str]] = {
     "surface":     ["asphalt_road", "cobblestone_road", "gravel_road", "dirt_road", "cycle_path"],
-    "environment": ["forest", "open_field", "water", "industry", "city"],
+    "environment": ["forest", "open_field", "water", "city"],
     "traffic":     ["traffic_light", "car", "person", "bicycle_rider"],
 }
 
@@ -291,8 +290,6 @@ DEFAULT_WEIGHTS: dict[str, dict[str, float]] = {
         "frac_open_field": 0.5,
         "scene_open_field": 0.4,
         "scene_forest":    0.4,
-        "frac_industry":   -0.9,
-        "scene_industry":  -0.9,
         "frac_city":       -0.4,
         "scene_city":      -0.3,
     },
