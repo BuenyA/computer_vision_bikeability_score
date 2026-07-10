@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.6)  14 JUN 2026 15:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.6)  10 JUL 2026 10:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**c:/Users/aydem/Documents/DHBW/process_intelligence/computer_vision_bikeability_score/paper/dokumentation.tex
-(c:/Users/aydem/Documents/DHBW/process_intelligence/computer_vision_bikeability_score/paper/dokumentation.tex
+**c:/Users/aydem/Documents/DHBW/computer_vision/computer_vision_bikeability_score/paper/dokumentation.tex
+(c:/Users/aydem/Documents/DHBW/computer_vision/computer_vision_bikeability_score/paper/dokumentation.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
 (C:\Users\aydem\AppData\Local\Programs\MiKTeX\tex/latex/ieeetran\IEEEtran.cls
@@ -521,12 +521,12 @@ Package rerunfilecheck Info: File `dokumentation.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  16855 strings out of 467871
- 334579 string characters out of 5418377
+ 334509 string characters out of 5418377
  826174 words of memory out of 5000000
  45537 multiletter control sequences out of 15000+600000
  730034 words of font info for 130 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,9n,80p,330b,1040s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,9n,80p,325b,1040s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/aydem/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/aydem/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/aydem/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/aydem/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
 Output written on dokumentation.pdf (2 pages, 67811 bytes).
 PDF statistics:
