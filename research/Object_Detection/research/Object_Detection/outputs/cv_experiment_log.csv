@@ -1,0 +1,2 @@
+timestamp,source_folder,model_weights,half_precision,confidence_threshold,images_processed,avg_inference_ms,total_person_detected,total_bicycle_detected,total_motorcycle_detected,total_car_detected,total_traffic light_detected
+2026-07-17 20:48:39,../../dataset/frames/beispiel_dji_0390/original,yolo26m.pt,False,0.15,4,94.24,7,1,0,16,8
