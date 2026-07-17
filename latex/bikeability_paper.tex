@@ -1,0 +1,373 @@
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+
+\begin{document}
+
+\title{A Computer-Vision-Based Bikeability Score}
+
+\author{Bünyamin~Aydemir,
+        Gonzalo~Guerrero~Salazar,
+        and~Hendrick~Fischer% <-this % stops a space
+\thanks{Manuscript created July 2026. The authors are students at the
+Baden-Württemberg Cooperative State University (DHBW) within the
+Computer Vision course.}}
+
+% The paper headers
+\markboth{Computer Vision -- Project Work, DHBW, 2026}%
+{Aydemir \MakeLowercase{\textit{et al.}}: A Computer-Vision-Based Bikeability Score}
+
+\maketitle
+
+\begin{abstract}
+% --- NOTE: This section will be written later (part of page 1). ---
+\end{abstract}
+
+\begin{IEEEkeywords}
+Bikeability, computer vision, zero-shot classification, vision-language models,
+CLIP, surface classification, object detection, GPX.
+\end{IEEEkeywords}
+
+% =====================================================================
+% PAGE 1 -- Introduction, research approach/methodology, objectives,
+% constraints (to be written later, headings only here)
+% =====================================================================
+
+\section{Introduction}
+% --- NOTE: This section will be written later. ---
+
+\section{Research Approach and Methodology}
+% --- NOTE: This section will be written later. ---
+
+\section{Objectives and Constraints}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% PAGE 2 -- GROUND DETECTION (Bünyamin Aydemir)
+% =====================================================================
+
+\clearpage
+\section{Ground Detection: Zero-Shot Classification of the Road Surface}
+
+\emph{Ground detection} determines the ridden surface class for every
+video frame and thereby provides the first of the three sub-components
+of the bikeability score. Since each frame corresponds to exactly
+\emph{one} surface class, the task is formulated as
+\emph{whole-image classification} (following the principle
+\enquote{whole image $=$ one class}) rather than semantic segmentation.
+The input images originate from a camera mounted at the front of the
+bicycle handlebar and are sampled at one frame per second.
+
+\subsection{Task Type and Model Class}
+Because neither annotated target classes nor a project-specific training
+set are available in field operation, the surface is determined
+\emph{training-free} (zero-shot). This leads to the choice of
+\emph{vision-language models} (VLM) of the CLIP family \cite{clip},
+which select the matching class from an image and a set of text prompts
+without any fine-tuning. Classical CNNs trained on ImageNet do not know
+application-specific classes such as \enquote{gravel path} and are
+therefore ruled out.
+
+A distinction that is frequently confused in the current literature is
+central here: \emph{linear probing} of self-supervised features
+(e.g., DINOv2/DINOv3 \cite{dinov2}) is \emph{not} a zero-shot method.
+A linear classifier on frozen features requires trained labels of the
+target classes and is therefore \emph{supervised}. Such a method is
+deliberately not counted as zero-shot here; at most it could serve as an
+explicitly declared \emph{non-zero-shot reference point}.
+
+\subsection{Surface Classes and Prompt Ensembling}
+Four cycling-relevant classes are distinguished:
+\textbf{Cycleway} (paved bike path), \textbf{Road}
+(paved/asphalt road), \textbf{Gravel} (gravel/crushed stone), and
+\textbf{Unpaved} (dirt/field track). Since \emph{Cycleway} and
+\emph{Road} both consist of smooth asphalt on the surface, the text
+prompts deliberately emphasize the \emph{distinguishing context}
+(narrow, structurally separated, bicycle pictogram vs. wide, cars,
+center line, multiple lanes) rather than only the texture. For each
+class, several English descriptions are used, and their text embeddings
+are averaged and normalized (\emph{prompt ensembling} as in the CLIP
+paper \cite{clip}), which makes the class embeddings more discriminative.
+An image is classified via the cosine similarity to these class
+embeddings; a softmax yields class probabilities.
+
+\subsection{Compared Models}
+To ensure a fair comparison, all models are accessed through the unified
+\texttt{open\_clip} API \cite{openclip}. A range from \emph{very light}
+to \emph{medium-sized} is deliberately considered -- all local/edge
+capable, no closed \enquote{killer model}. Table~\ref{tab:models}
+summarizes the considered architectures.
+
+\begin{table}[!t]
+\caption{Models compared in the zero-shot benchmark.}
+\label{tab:models}
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Model} & \textbf{Characteristic}\\
+\midrule
+CLIP ViT-B/32, B/16, L/14 \cite{clip} & Classical reference\\
+OpenCLIP (LAION-2B, DataComp-XL) \cite{openclip,datacomp} & Dataset influence\\
+SigLIP ViT-B/16 \cite{siglip} & Efficient zero-shot standard\\
+MobileCLIP S0, S2 \cite{mobileclip} & Latency-optimized\\
+EVA02-B/16 \cite{evaclip} & Open zero-shot default\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrics}
+The benchmark evaluates the models along two axes:
+\emph{accuracy} and \emph{latency}.
+
+\paragraph{Accuracy} Since the classes are imbalanced, in addition to
+accuracy we mainly report the \emph{balanced accuracy} (mean of the
+per-class recalls) and the \emph{macro-F1}. In addition, a
+\emph{confusion matrix}, a \emph{bootstrap confidence interval}
+(95\,\%, 2000 resamples) on the accuracy, and the \emph{McNemar test}
+for pairwise model comparison are computed per model. The McNemar test
+checks on the discordant predictions whether an accuracy difference is
+\emph{statistically significant} ($p < 0.05$) and not merely noise on a
+small test set.
+
+\paragraph{Latency} On fixed hardware, the pure inference latency is
+measured at \emph{batch size 1} (real use case: video at the handlebar):
+several warm-up runs, followed by $N$ measured single inferences
+including GPU synchronization. The mean, standard deviation, the 95th
+percentile, and the throughput in frames per second (FPS) are reported.
+
+\subsection{Result Presentation}
+The central overall representation is a scatter plot of
+\emph{accuracy vs. latency} (Fig.~\ref{fig:pareto}). Each point is a
+model (point size $\propto$ number of parameters); the drawn
+\emph{Pareto front} connects the models that achieve the best accuracy
+for a given latency -- i.e., the best trade-off for use at the bicycle
+handlebar. In practice, \textbf{MobileCLIP} variants often lie on the
+Pareto front, as they offer a very favorable latency-accuracy ratio
+without requiring an oversized model.
+
+\begin{figure}[!t]
+\centering
+% \includegraphics[width=\columnwidth]{images/pareto_accuracy_latency}
+\caption{Accuracy (macro-F1) vs. latency (ms/frame, batch size 1).
+Point size $\propto$ number of parameters; the dashed line marks the
+Pareto front. \emph{Figure to follow.}}
+\label{fig:pareto}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+% \includegraphics[width=\columnwidth]{images/confusion_matrices}
+\caption{Row-normalized confusion matrices per model. They show which
+surfaces are confused (typically Gravel~$\leftrightarrow$~Unpaved as
+well as Road~$\leftrightarrow$~Cycleway). \emph{Figure to follow.}}
+\label{fig:confusion}
+\end{figure}
+
+For reproducibility: latency values are strongly hardware-dependent,
+therefore the concrete computing device (CPU/GPU model, RAM) as well as
+the used \texttt{DEVICE} are documented. All models use the same full
+image, the same prompt ensembling, and the same \texttt{open\_clip}
+pipeline; observed differences therefore stem from architecture and
+training data, not from the evaluation.
+
+% =====================================================================
+% PAGE 3 -- OBJECT DETECTION (not Bünyamin -- heading only)
+% =====================================================================
+
+\clearpage
+\section{Object Detection}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% PAGE 4 -- ENVIRONMENT DETECTION (not Bünyamin -- heading only)
+% =====================================================================
+
+\clearpage
+\section{Environment Detection}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% PAGE 5 -- BIKEABILITY SCORE (Bünyamin Aydemir)
+% =====================================================================
+
+\clearpage
+\section{Computation of the Bikeability Score}
+
+The bikeability score combines the three sub-components -- surface
+(ground detection), environment (environment detection), and objects
+(object detection) -- into a single value in the interval $[0, 100]$.
+Each model output is first transformed into a \emph{sub-score} in
+$[0,1]$; the three sub-scores are then combined in a weighted manner.
+
+\subsection{Overall Formula}
+For each evaluated frame, the score $A$ results from the weighted mean
+of the three sub-scores:
+\begin{equation}
+\label{eq:score}
+A = 100 \cdot \Big( w_g \, S_{\text{ground}}
+                  + w_e \, S_{\text{env}}
+                  + w_o \, S_{\text{object}} \Big),
+\end{equation}
+with the weights
+\begin{equation}
+\label{eq:weights}
+w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35,
+\qquad w_g + w_e + w_o = 1.
+\end{equation}
+Since all sub-scores lie in $[0,1]$ and the weights sum to $1$, the
+score is \emph{guaranteed} to be bounded to $[0, 100]$.
+
+\subsection{Ground and Environment Sub-Score}
+The surface and environment sub-scores result from a direct lookup of
+the respective class quality. If, instead of a single class, a share
+distribution $\{(k, p_k)\}$ is present, the weighted mean of the class
+qualities is formed:
+\begin{equation}
+\label{eq:sub_lookup}
+S_{\text{ground}} = \sum_{k} q^{g}_{k}\, p_{k},
+\qquad
+S_{\text{env}} = \sum_{k} q^{e}_{k}\, p_{k},
+\end{equation}
+where $p_k$ is the share of class $k$ ($\sum_k p_k = 1$) and
+$q^{g}_{k}, q^{e}_{k} \in [0,1]$ are the stored quality values.
+Table~\ref{tab:quality} lists the (heuristic) quality values used.
+
+\begin{table}[!b]
+\caption{Class quality values for the ground and environment sub-score
+as well as object penalty factors.}
+\label{tab:quality}
+\centering
+\begin{tabular}{@{}llc@{}}
+\toprule
+\textbf{Component} & \textbf{Class} & \textbf{Value}\\
+\midrule
+\multirow{4}{*}{Ground $q^{g}_{k}$}
+  & Cycleway & $1.0$\\
+  & Road     & $0.7$\\
+  & Gravel   & $0.3$\\
+  & Unpaved  & $0.1$\\
+\midrule
+\multirow{3}{*}{Environment $q^{e}_{k}$}
+  & Vegetation & $1.0$\\
+  & Water      & $1.0$\\
+  & City       & $0.4$\\
+\midrule
+\multirow{3}{*}{Object penalty $\lambda_k$}
+  & Car     & $+1.0$\\
+  & Bus     & $+2.0$\\
+  & Bicycle & $-0.2$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Object Sub-Score}
+The object sub-score evaluates the detected object counts $n_k$
+(e.g., cars, buses, cyclists). Via a \emph{saturation function}, a
+weighted object density is mapped onto $(0, 1]$:
+\begin{equation}
+\label{eq:sub_object}
+S_{\text{object}} = \exp\!\Big( -\max\big(\rho, 0\big) \Big),
+\qquad
+\rho = \frac{1}{N}\sum_{k} \lambda_k\, n_k,
+\end{equation}
+with the number of evaluated frames $N$ and the penalty factors
+$\lambda_k$ from Table~\ref{tab:quality}. Positive penalty factors
+(e.g., cars, buses) lower the sub-score, while bicycle-friendly objects
+such as other cyclists receive a \emph{negative} factor and raise the
+score slightly. The exponential form is robust against outliers: a
+single overcrowded frame does not dominate the overall score.
+
+\subsection{Route Evaluation and Aggregation}
+To evaluate a complete ride, the video is sampled at fixed intervals
+(every $5$\,s, i.e., every $\lfloor \text{FPS}\cdot 5\rfloor$-th frame)
+and a score is computed for each frame according to
+Eq.~\eqref{eq:score}. Each row is stored in a CSV with a timestamp
+(seconds from video start, \texttt{HH:MM:SS}, and optionally an absolute
+ISO timestamp). Via the absolute timestamp, the frame scores can then be
+\emph{merged} with the GPX track points of the ride and located
+geographically. The \emph{average} bikeability score of the route
+results as the mean over all $M$ evaluated frames:
+\begin{equation}
+\label{eq:avg}
+\bar{A} = \frac{1}{M} \sum_{i=1}^{M} A_i .
+\end{equation}
+
+Figure~\ref{fig:route} shows the final result: the bikeability score
+colored along the GPX route, which visualizes the section-wise
+cycling-friendliness of the ridden route.
+
+\begin{figure}[!t]
+\centering
+% \includegraphics[width=\columnwidth]{images/bikeability_route_map}
+\caption{Bikeability score colored along the GPX route. The frame scores
+are merged with the GPX track points via the absolute timestamp.
+\emph{Figure to follow.}}
+\label{fig:route}
+\end{figure}
+
+% =====================================================================
+% CONCLUSION (to be written later, heading only)
+% =====================================================================
+
+\section{Conclusion}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% Bibliography
+% =====================================================================
+
+\begin{thebibliography}{1}
+
+\bibitem{clip}
+A. Radford \emph{et al.}, ``Learning transferable visual models from
+natural language supervision,'' in \emph{Proc. Int. Conf. Machine
+Learning (ICML)}, 2021, pp. 8748--8763.
+
+\bibitem{openclip}
+G. Ilharco \emph{et al.}, ``OpenCLIP,'' Zenodo, 2021.
+[Online]. Available: \url{https://github.com/mlfoundations/open_clip}
+
+\bibitem{siglip}
+X. Zhai, B. Mustafa, A. Kolesnikov, and L. Beyer, ``Sigmoid loss for
+language image pre-training,'' in \emph{Proc. IEEE/CVF Int. Conf.
+Computer Vision (ICCV)}, 2023, pp. 11975--11986.
+
+\bibitem{mobileclip}
+P. K. A. Vasu \emph{et al.}, ``MobileCLIP: Fast image-text models
+through multi-modal reinforced training,'' in \emph{Proc. IEEE/CVF Conf.
+Computer Vision and Pattern Recognition (CVPR)}, 2024.
+
+\bibitem{evaclip}
+Q. Sun, Y. Fang, L. Wu, X. Wang, and Y. Cao, ``EVA-CLIP: Improved
+training techniques for CLIP at scale,'' \emph{arXiv preprint
+arXiv:2303.15389}, 2023.
+
+\bibitem{datacomp}
+S. Y. Gadre \emph{et al.}, ``DataComp: In search of the next generation
+of multimodal datasets,'' in \emph{Proc. Advances in Neural Information
+Processing Systems (NeurIPS)}, 2023.
+
+\bibitem{dinov2}
+M. Oquab \emph{et al.}, ``DINOv2: Learning robust visual features
+without supervision,'' \emph{Trans. Machine Learning Research (TMLR)},
+2024.
+
+\end{thebibliography}
+
+\end{document}
