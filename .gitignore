@@ -35,3 +35,5 @@ Thumbs.db
 dataset/frames/*
 !dataset/frames/beispiel_dji_0390/
 !dataset/frames/beispiel_dji_0390/**
+dataset/testdataset
+research/ground_detection/dataset

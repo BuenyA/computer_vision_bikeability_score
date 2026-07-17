@@ -1,4 +1,4 @@
-\documentclass[lettersize,journal]{IEEEtran}
+\documentclass[letterpaper,journal]{IEEEtran}
 \usepackage{amsmath,amsfonts}
 \usepackage{algorithmic}
 \usepackage{algorithm}
@@ -118,7 +118,8 @@ summarizes the considered architectures.
 \caption{Models compared in the zero-shot benchmark.}
 \label{tab:models}
 \centering
-\begin{tabular}{@{}ll@{}}
+\small
+\begin{tabular}{@{}p{0.55\columnwidth}p{0.35\columnwidth}@{}}
 \toprule
 \textbf{Model} & \textbf{Characteristic}\\
 \midrule
@@ -228,7 +229,7 @@ with the weights
 \begin{equation}
 \label{eq:weights}
 w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35,
-\qquad w_g + w_e + w_o = 1.
+\quad w_g + w_e + w_o = 1.
 \end{equation}
 Since all sub-scores lie in $[0,1]$ and the weights sum to $1$, the
 score is \emph{guaranteed} to be bounded to $[0, 100]$.
@@ -332,42 +333,7 @@ are merged with the GPX track points via the absolute timestamp.
 % Bibliography
 % =====================================================================
 
-\begin{thebibliography}{1}
-
-\bibitem{clip}
-A. Radford \emph{et al.}, ``Learning transferable visual models from
-natural language supervision,'' in \emph{Proc. Int. Conf. Machine
-Learning (ICML)}, 2021, pp. 8748--8763.
-
-\bibitem{openclip}
-G. Ilharco \emph{et al.}, ``OpenCLIP,'' Zenodo, 2021.
-[Online]. Available: \url{https://github.com/mlfoundations/open_clip}
-
-\bibitem{siglip}
-X. Zhai, B. Mustafa, A. Kolesnikov, and L. Beyer, ``Sigmoid loss for
-language image pre-training,'' in \emph{Proc. IEEE/CVF Int. Conf.
-Computer Vision (ICCV)}, 2023, pp. 11975--11986.
-
-\bibitem{mobileclip}
-P. K. A. Vasu \emph{et al.}, ``MobileCLIP: Fast image-text models
-through multi-modal reinforced training,'' in \emph{Proc. IEEE/CVF Conf.
-Computer Vision and Pattern Recognition (CVPR)}, 2024.
-
-\bibitem{evaclip}
-Q. Sun, Y. Fang, L. Wu, X. Wang, and Y. Cao, ``EVA-CLIP: Improved
-training techniques for CLIP at scale,'' \emph{arXiv preprint
-arXiv:2303.15389}, 2023.
-
-\bibitem{datacomp}
-S. Y. Gadre \emph{et al.}, ``DataComp: In search of the next generation
-of multimodal datasets,'' in \emph{Proc. Advances in Neural Information
-Processing Systems (NeurIPS)}, 2023.
-
-\bibitem{dinov2}
-M. Oquab \emph{et al.}, ``DINOv2: Learning robust visual features
-without supervision,'' \emph{Trans. Machine Learning Research (TMLR)},
-2024.
-
-\end{thebibliography}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 
 \end{document}

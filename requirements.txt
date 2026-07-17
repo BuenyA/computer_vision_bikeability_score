@@ -1,9 +1,12 @@
 imageio-ffmpeg
 opencv-python
 numpy
+pandas
 matplotlib
 ultralytics
 torch
 transformers
 pillow
+ipywidgets
+ipyevents
 
