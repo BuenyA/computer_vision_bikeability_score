@@ -65,8 +65,10 @@ SegFormer thresholds are aligned to these definitions; `unsure`/`reject`
   boundary was the fuzziest rule and the weakest class for both models
   (open_field F1 0.47–0.74); the merge lifted vegetation to 0.85–0.89, flipped
   the model ranking (§10 S8), and required **no re-labelling**
-  (`vegetation = forest OR open_field`; 4-class backup:
-  `dataset/test_images/labels_4class_backup.csv`). Beauty weight consequence:
+  (`vegetation = forest OR open_field`, applied in place to `labels.csv`; the
+  temporary 4-class backup was discarded once the 3-class taxonomy was final —
+  the 4-class era remains documented in
+  `environment_model/finetune/tuning_log_4class.md`). Beauty weight consequence:
   single `frac_vegetation` weight 0.7 (was forest 0.8 / open_field 0.5).
 
 ## 3. Data sources & roles
