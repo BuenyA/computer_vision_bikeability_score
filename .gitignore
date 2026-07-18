@@ -52,3 +52,7 @@ models/_tmp_experiments/
 # --- Trainingsbilder-Ordner (Symlinks/Kopien, generiert von organize_training_images.py) ---
 dataset/training/*
 !dataset/training/manifest.csv
+
+# --- Ground-Detection Daten (von main) ---
+dataset/testdataset
+research/ground_detection/dataset
