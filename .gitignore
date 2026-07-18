@@ -48,8 +48,6 @@ dataset/external/
 # --- Finetune-Experimente (temporäre Trainer-Ausgaben) ---
 models/_tmp_experiments/
 
-# --- Trainierte Modell-Gewichte (groß, reproduzierbar via seg_finetune.ipynb) ---
-models/segformer_env/model.safetensors
 
 # --- Trainingsbilder-Ordner (Symlinks/Kopien, generiert von organize_training_images.py) ---
 dataset/training/*
