@@ -6,4 +6,6 @@ ultralytics
 torch
 transformers
 pillow
+pandas==3.0.3
+scipy==1.18.0
 
