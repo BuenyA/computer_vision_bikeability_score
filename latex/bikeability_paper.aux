@@ -1,5 +1,5 @@
 \relax 
-\providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
+\providecommand\babel@aux[2]{}
 \@nameuse{bbl@beforestart}
 \babel@aux{english}{}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
@@ -20,16 +20,41 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Compared Models}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Metrics}{2}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Models compared in the zero-shot benchmark.}}{2}{}\protected@file@percent }
-\newlabel{tab:models}{{I}{2}{}{table.1}{}}
+\newlabel{tab:models}{{I}{2}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Accuracy (macro-F1) vs. latency (ms/frame, batch size 1). Point size $\propto $ number of parameters; the dashed line marks the Pareto front. \emph  {Figure to follow.}}}{2}{}\protected@file@percent }
-\newlabel{fig:pareto}{{1}{2}{}{figure.1}{}}
+\newlabel{fig:pareto}{{1}{2}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Row-normalized confusion matrices per model. They show which surfaces are confused (typically Gravel~$\leftrightarrow $~Unpaved as well as Road~$\leftrightarrow $~Cycleway). \emph  {Figure to follow.}}}{2}{}\protected@file@percent }
-\newlabel{fig:confusion}{{2}{2}{}{figure.2}{}}
+\newlabel{fig:confusion}{{2}{2}}
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-D}0a}Accuracy}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-D}0b}Latency}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Result Presentation}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {V}Object Detection}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Environment Detection}{4}{}\protected@file@percent }
+\citation{clip}
+\citation{urbanclip}
+\citation{segformer}
+\citation{urbanclip}
+\citation{greenery}
+\citation{clip}
+\citation{clip}
+\citation{mapillaryvistas}
+\citation{ade20k}
+\citation{ade20k,ftsegformer}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Environment-model comparison on the own-frames test set (1{,}210 ride-disjoint cyclist-POV frames; 983 vegetation / 40 water / 307 city positives), decision thresholds tuned on the validation split only. \textbf  {(a)}~Per-class and aggregate accuracy: the fine-tuned SegFormer wins macro-F1, label-accuracy, exact-match and water, while CLIP edges vegetation; water is the shared weakness. \textbf  {(b)}~Both models run at comparable latency, but SegFormer uses $40\times $ fewer parameters (Apple MPS, warmed, batch~1; bar label $=$ \#params). \textbf  {(c)}~Macro-F1 across the optimization steps of Tables~\ref  {tab:clip-opt} and~\ref  {tab:seg-opt}; the drop at the shaded stage is the harder water-inclusive test, not a regression.}}{4}{}\protected@file@percent }
+\newlabel{fig:env}{{3}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Environment Detection: Zero-Shot vs.\ Fine-Tuned Semantic Segmentation}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Task Type and Model Class}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Environment Classes and Taxonomy}{4}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces CLIP zero-shot optimization steps (own-frames test; $\Delta $ is the macro-F1 change over the previous adopted step). Final config: ViT-B/32, prompt ensembling, per-class thresholds veg~$0.035$\,/\,water~$0.39$\,/\,city~$0.73$.}}{4}{}\protected@file@percent }
+\newlabel{tab:clip-opt}{{II}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Zero-Shot CLIP: Optimization}{4}{}\protected@file@percent }
+\citation{mapillaryvistas}
+\citation{ade20k}
+\citation{ade20k}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces SegFormer fine-tuning optimization steps. ``dev'' $=$ Mapillary mask-derived validation; ``own-test'' $=$ cyclist-POV frames. Final config: B0 ADE20K base, 3~classes $+$ ``other'', thresholds veg~$0.25$\,/\,water~$10^{-4}$\,/\,city~$0.0056$.}}{5}{}\protected@file@percent }
+\newlabel{tab:seg-opt}{{III}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Fine-Tuned SegFormer: Optimization}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Metrics and Protocol}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-F}}Results and Decision}{5}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{clip}{1}
@@ -39,20 +64,26 @@
 \bibcite{siglip}{5}
 \bibcite{mobileclip}{6}
 \bibcite{evaclip}{7}
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Computation of the Bikeability Score}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Overall Formula}{5}{}\protected@file@percent }
-\newlabel{eq:score}{{1}{5}{}{equation.1}{}}
-\newlabel{eq:weights}{{2}{5}{}{equation.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Ground and Environment Sub-Score}{5}{}\protected@file@percent }
-\newlabel{eq:sub_lookup}{{3}{5}{}{equation.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Object Sub-Score}{5}{}\protected@file@percent }
-\newlabel{eq:sub_object}{{4}{5}{}{equation.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Class quality values for the ground and environment sub-score as well as object penalty factors.}}{5}{}\protected@file@percent }
-\newlabel{tab:quality}{{II}{5}{}{table.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Bikeability score colored along the GPX route. The frame scores are merged with the GPX track points via the absolute timestamp. \emph  {Figure to follow.}}}{5}{}\protected@file@percent }
-\newlabel{fig:route}{{3}{5}{}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-D}}Route Evaluation and Aggregation}{5}{}\protected@file@percent }
-\newlabel{eq:avg}{{5}{5}{}{equation.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
-\gdef \@abspage@last{5}
+\bibcite{urbanclip}{8}
+\bibcite{segformer}{9}
+\bibcite{greenery}{10}
+\bibcite{mapillaryvistas}{11}
+\bibcite{ade20k}{12}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Computation of the Bikeability Score}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Overall Formula}{6}{}\protected@file@percent }
+\newlabel{eq:score}{{1}{6}}
+\newlabel{eq:weights}{{2}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Ground and Environment Sub-Score}{6}{}\protected@file@percent }
+\newlabel{eq:sub_lookup}{{3}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Object Sub-Score}{6}{}\protected@file@percent }
+\newlabel{eq:sub_object}{{4}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Class quality values for the ground and environment sub-score as well as object penalty factors.}}{6}{}\protected@file@percent }
+\newlabel{tab:quality}{{IV}{6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Bikeability score colored along the GPX route. The frame scores are merged with the GPX track points via the absolute timestamp. \emph  {Figure to follow.}}}{6}{}\protected@file@percent }
+\newlabel{fig:route}{{4}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-D}}Route Evaluation and Aggregation}{6}{}\protected@file@percent }
+\newlabel{eq:avg}{{5}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
+\bibcite{ftsegformer}{13}
+\gdef \@abspage@last{7}

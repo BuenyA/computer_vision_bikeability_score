@@ -200,8 +200,154 @@ training data, not from the evaluation.
 % =====================================================================
 
 \clearpage
-\section{Environment Detection}
-% --- NOTE: This section will be written later. ---
+\section{Environment Detection: Zero-Shot vs.\ Fine-Tuned
+Semantic Segmentation}
+
+\emph{Environment detection} classifies the surroundings of every frame and
+supplies the environment sub-component, which carries the \emph{largest} weight
+in the bikeability score ($w_e = 0.45$, Eq.~\eqref{eq:weights}). Unlike ground
+detection, the task is \emph{multi-label whole-image} classification: a frame may
+show vegetation, water and a built-up scene at once -- or none of them. We compare
+two paradigms: a training-free \emph{vision--language model} (CLIP~\cite{clip},
+following recent street-view work~\cite{urbanclip}) and a fine-tuned
+\emph{semantic-segmentation} transformer (SegFormer~\cite{segformer}) whose
+per-class pixel-area fractions feed the sub-score directly
+(Eq.~\eqref{eq:sub_lookup}).
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{images/fig_env_comparison}
+\caption{Environment-model comparison on the own-frames test set
+(1{,}210 ride-disjoint cyclist-POV frames; 983 vegetation / 40 water / 307 city
+positives), decision thresholds tuned on the validation split only.
+\textbf{(a)}~Per-class and aggregate accuracy: the fine-tuned SegFormer wins
+macro-F1, label-accuracy, exact-match and water, while CLIP edges vegetation;
+water is the shared weakness. \textbf{(b)}~Both models run at comparable latency,
+but SegFormer uses $40\times$ fewer parameters (Apple MPS, warmed, batch~1;
+bar label $=$ \#params). \textbf{(c)}~Macro-F1 across the optimization steps of
+Tables~\ref{tab:clip-opt} and~\ref{tab:seg-opt}; the drop at the shaded stage is
+the harder water-inclusive test, not a regression.}
+\label{fig:env}
+\end{figure*}
+
+\subsection{Task Type and Model Class}
+The two model classes answer the multi-label question differently.
+\emph{Zero-shot CLIP} derives a per-class present-probability from prompt pairs
+and needs no application-specific training data, as demonstrated for street-view
+imagery in~\cite{urbanclip}. \emph{Fine-tuned SegFormer} instead predicts a pixel
+mask whose class-area fractions are thresholded into presence; these fractions are
+richer than a scalar probability and are exactly the signal the beauty score
+consumes~\cite{greenery}. Both models are light enough for local/edge inference.
+
+\subsection{Environment Classes and Taxonomy}
+Three cycling-relevant classes are distinguished: \textbf{Vegetation}
+(trees, grass, fields), \textbf{Water} (river, lake, canal or sea covering
+more than about $2\%$ of the frame) and \textbf{City} (buildings, industry, or a street
+with houses). The taxonomy was deliberately simplified during development from
+five to three classes: an \emph{industry} class was folded into \emph{City}, and
+the fuzzy \emph{forest}/\emph{open-field} boundary -- the weakest class for both
+models -- was merged into \emph{Vegetation}. This merge was the single most
+impactful design change (Table~\ref{tab:seg-opt}, S9). The fine-tuned model
+additionally learns an explicit \emph{``other''} background class, so that
+background pixels are not force-assigned to an environment class. Water is
+intrinsically rare in street-level imagery, which drives much of the
+optimization below.
+
+\subsection{Zero-Shot CLIP: Optimization}
+Table~\ref{tab:clip-opt} lists the zero-shot track. Two levers dominated:
+\emph{per-class threshold calibration} on a leakage-free validation split
+($+0.095$ macro-F1) and \emph{prompt ensembling}~\cite{clip}, which averages the
+text embeddings of 6--8 templates per class ($+0.044$). Model capacity did
+\emph{not} help -- ViT-L/14 was worse and $\sim$24$\times$ slower to encode, and
+was rejected. The final water-inclusive test then revealed that CLIP's apparent
+water strength was a small-validation artifact (water F1 $0.615$ on validation vs.\
+$0.206$ on the held-out test rides).
+
+\begin{table}[!t]
+\caption{CLIP zero-shot optimization steps (own-frames test; $\Delta$ is the
+macro-F1 change over the previous adopted step). Final config: ViT-B/32,
+prompt ensembling, per-class thresholds veg~$0.035$\,/\,water~$0.39$\,/\,city~$0.73$.}
+\label{tab:clip-opt}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{0.045\columnwidth}>{\raggedright\arraybackslash}p{0.5\columnwidth}>{\raggedright\arraybackslash}p{0.34\columnwidth}@{}}
+\toprule
+\textbf{\#} & \textbf{Optimization step} & \textbf{Effect / decision}\\
+\midrule
+C1 & Aligned prompt pairs, global threshold & baseline\\
+C2 & Ride-disjoint val/test split & leakage-free tuning\\
+C3 & Per-class threshold calibration & \textbf{+0.095}; top lever\\
+C4 & Prompt ensembling, 6--8 templates~\cite{clip} & $+0.044$; adopted\\
+C5 & Larger backbone ViT-L/14 & $-0.015$, 24$\times$ slower; rejected\\
+C6 & 3-class taxonomy (veg.\ merge) & best config\\
+C7 & Water-inclusive final test & water F1 $.62{\to}.21$: artifact\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Fine-Tuned SegFormer: Optimization}
+Table~\ref{tab:seg-opt} lists the fine-tuning track. The decisive gains were about
+\emph{data}, not hyperparameters: water is so rare that a random Mapillary
+sample~\cite{mapillaryvistas} contained almost none, so class-balanced sampling
+with water oversampling plus 258 added ADE20K water scenes~\cite{ade20k} lifted
+water IoU from $0$ to $0.70$. Swapping the encoder to an ADE20K-pretrained
+base~\cite{ade20k,ftsegformer}, which already carries a water prior, and adding
+the explicit \emph{``other''} class raised own-test label-accuracy from $0.649$ to
+$0.863$. A fine-tuning ablation (S10) isolates the value of transfer learning
+itself: $+0.027$ macro-F1 over the raw checkpoint, concentrated in \emph{City}.
+
+\begin{table}[!t]
+\caption{SegFormer fine-tuning optimization steps. ``dev'' $=$ Mapillary
+mask-derived validation; ``own-test'' $=$ cyclist-POV frames. Final config: B0
+ADE20K base, 3~classes $+$ ``other'', thresholds
+veg~$0.25$\,/\,water~$10^{-4}$\,/\,city~$0.0056$.}
+\label{tab:seg-opt}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{0.06\columnwidth}>{\raggedright\arraybackslash}p{0.49\columnwidth}>{\raggedright\arraybackslash}p{0.34\columnwidth}@{}}
+\toprule
+\textbf{\#} & \textbf{Optimization step} & \textbf{Effect / decision}\\
+\midrule
+S1 & Cityscapes-B0, random Mapillary~\cite{mapillaryvistas} & water F1 $0.00$ (baseline)\\
+S2 & Learning rate $6\!\times\!10^{-5}{\to}2\!\times\!10^{-4}$ & $+0.05$; water still $0$\\
+S3--4 & Balanced $+$ water $\times2\text{--}6$ $+$ ADE water~\cite{ade20k} & water IoU $0{\to}0.70$: key fix\\
+S5 & Base swap $\to$ ADE20K (water prior)~\cite{ade20k} & water IoU $0.778$, mIoU $0.857$\\
+S6 & Copy-paste water augmentation & water IoU $-0.11$; rejected\\
+S8 & Explicit ``other'' background class & label-acc $.65{\to}.86$\\
+S9 & 3-class taxonomy retrain & own-test macro $0.874$; deployed\\
+S10 & Fine-tuning ablation (no-FT) & FT worth $+0.027$ (city $+0.05$)\\
+S11 & Fine threshold grid ($\to 10^{-4}$) $+$ final test & \textbf{macro 0.704: wins}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrics and Protocol}
+The two models are evaluated as multi-label classifiers on \textbf{macro-F1}
+(unweighted mean of the per-class F1), \textbf{label-accuracy} (mean
+per-(frame,\,class) correctness), \textbf{exact-match} (fraction of fully-correct
+label vectors) and \textbf{per-class F1}; segmentation quality is tracked via mIoU
+during training. The headline evaluation set is \textbf{1{,}210} cyclist-POV frames
+that are ride-disjoint from all tuning (983 vegetation / 40 water / 307 city
+positives), and every decision threshold is fitted on a separate validation split
+only, so the test rides are never seen during calibration.
+
+\subsection{Results and Decision}
+Figure~\ref{fig:env} summarizes the head-to-head. The fine-tuned SegFormer wins
+\emph{every} aggregate metric (macro-F1 $0.704$ vs.\ $0.649$; label-accuracy
+$0.911$ vs.\ $0.888$; exact-match $0.755$ vs.\ $0.691$) while using $40\times$
+fewer parameters ($3.7$\,M vs.\ $151$\,M) at comparable latency
+(Fig.~\ref{fig:env}b). A per-class \emph{hybrid} routing of the two models was
+evaluated and rejected: the best routing gained $\le 0.005$ macro-F1 -- not worth
+carrying a second, far larger model. \emph{Water remains the shared limitation}:
+at best F1 $0.382$, the model is \emph{blind} rather than miscalibrated
+($68\%$ of true-water frames receive almost no water pixels), because in-domain
+water training data is scarce. The fine-tuned SegFormer is therefore the deployed
+environment model, and its per-class area fractions feed Eq.~\eqref{eq:sub_lookup}
+directly, which CLIP's probabilities cannot.
 
 % =====================================================================
 % PAGE 5 -- BIKEABILITY SCORE (Bünyamin Aydemir)
