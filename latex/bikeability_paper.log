@@ -343,27 +343,27 @@ File: l3backend-xetex.def 2022-02-07 L3 backend support: XeTeX
 (bikeability_paper.aux)
 \openout1 = `bikeability_paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 21.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 22.
 LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 2
-1.
+2.
  (ts1cmr.fd
 File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
 
 -- Lines per column: 58 (exact).
 Package caption Info: Begin \AtBeginDocument code.
@@ -374,27 +374,27 @@ Package caption Info: End \AtBeginDocument code.
 
 
 ]
-LaTeX Font Info:    Trying to load font information for U+msa on input line 73.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 74.
 
  (umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 73.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 74.
 
  (umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Underfull \hbox (badness 1406) in paragraph at lines 96--109
+Underfull \hbox (badness 1406) in paragraph at lines 97--110
 []\T1/ptm/m/n/10 Four cycling-relevant classes are dis-tin-guished: \T1/ptm/b/n
 /10 Cy-cle-
  []
 
 LaTeX Font Info:    Trying to load font information for T1+pcr on input line 11
-2.
+3.
 (t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 183--189
+Underfull \hbox (badness 10000) in paragraph at lines 184--190
 \T1/ptm/m/n/10 dependent, there-fore the con-crete com-put-ing de-vice
  []
 
@@ -404,22 +404,45 @@ Underfull \hbox (badness 10000) in paragraph at lines 183--189
 
 
 ]
-File: images/fig_env_comparison.pdf Graphic file (type pdf)
-<use images/fig_env_comparison.pdf>
- [4
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 317--317
-[]|\T1/ptm/m/n/8 S3--
+Underfull \hbox (badness 1924) in paragraph at lines 233--239
+[]\T1/ptm/m/n/10 Table II[] lists the track. Two levers dom-i-nated: \T1/ptm/m/
+it/10 per-
  []
 
-[5] (bikeability_paper.bbl [6
 
-]) [7
+LaTeX Font Warning: Font shape `T1/ptm/m/scit' undefined
+(Font)              using `T1/ptm/m/it' instead on input line 276.
+
+
+LaTeX Font Warning: Font shape `T1/ptm/m/scit' undefined
+(Font)              using `T1/ptm/m/it' instead on input line 276.
+
+
+LaTeX Font Warning: Font shape `T1/ptm/m/scit' undefined
+(Font)              using `T1/ptm/m/it' instead on input line 276.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 288--288
+[]|\T1/ptm/m/n/7 S3--
+ []
+
+
+Underfull \hbox (badness 2229) in paragraph at lines 300--306
+\T1/ptm/b/n/10 F1\T1/ptm/m/n/10 , \T1/ptm/b/n/10 label-accuracy \T1/ptm/m/n/10 
+(mean per-(frame,class) cor-rect-ness),
+ []
+
+File: images/fig_env_comparison.pdf Graphic file (type pdf)
+<use images/fig_env_comparison.pdf>
+[4
+
+] (bikeability_paper.bbl [5
+
+]) [6
 
 ] (bikeability_paper.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  )
-Output written on bikeability_paper.xdv (7 pages, 30408 bytes).
+Output written on bikeability_paper.xdv (6 pages, 27868 bytes).
