@@ -35,5 +35,24 @@ Thumbs.db
 dataset/frames/*
 !dataset/frames/beispiel_dji_0390/
 !dataset/frames/beispiel_dji_0390/**
+dataset/frames/beispiel_dji_0390/zeroshot/
+
+# --- Test-Set Bilder (generiert von environment_model/data/build_test_dataset.py) ---
+dataset/test_images/*
+!dataset/test_images/candidates.csv
+!dataset/test_images/labels.csv
+
+# --- Externe Datensaetze (grosse Downloads: Mapillary ~25 GB, ADE20K ~1 GB) ---
+dataset/external/
+
+# --- Finetune-Experimente (temporäre Trainer-Ausgaben) ---
+models/_tmp_experiments/
+
+
+# --- Trainingsbilder-Ordner (Symlinks/Kopien, generiert von organize_training_images.py) ---
+dataset/training/*
+!dataset/training/manifest.csv
+
+# --- Ground-Detection Daten (von main) ---
 dataset/testdataset
 research/ground_detection/dataset

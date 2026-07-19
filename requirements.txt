@@ -1,12 +1,12 @@
 imageio-ffmpeg
 opencv-python
 numpy
-pandas
 matplotlib
 ultralytics
 torch
 transformers
 pillow
+pandas==3.0.3
+scipy==1.18.0
 ipywidgets
 ipyevents
-
