@@ -1,0 +1,379 @@
+\documentclass[letterpaper,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+
+\begin{document}
+
+\title{A Computer-Vision-Based Bikeability Score}
+
+\author{Bünyamin~Aydemir,
+        Gonzalo~Guerrero~Salazar,
+        and~Hendrick~Fischer% <-this % stops a space
+\thanks{Manuscript created July 2026. The authors are students at the
+Baden-Württemberg Cooperative State University (DHBW) within the
+Computer Vision course.}}
+
+% The paper headers
+\markboth{Computer Vision -- Project Work, DHBW, 2026}%
+{Aydemir \MakeLowercase{\textit{et al.}}: A Computer-Vision-Based Bikeability Score}
+
+\maketitle
+
+\begin{abstract}
+% --- NOTE: This section will be written later (part of page 1). ---
+\end{abstract}
+
+\begin{IEEEkeywords}
+Bikeability, computer vision, zero-shot classification, vision-language models,
+CLIP, surface classification, object detection, GPX.
+\end{IEEEkeywords}
+
+% =====================================================================
+% PAGE 1 -- Introduction, research approach/methodology, objectives,
+% constraints (to be written later, headings only here)
+% =====================================================================
+
+\section{Introduction}
+% --- NOTE: This section will be written later. ---
+
+\section{Research Approach and Methodology}
+% --- NOTE: This section will be written later. ---
+
+\section{Objectives and Constraints}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% PAGE 2 -- GROUND DETECTION (Bünyamin Aydemir)
+% =====================================================================
+
+\clearpage
+\section{Ground Detection: Road-Surface Classification}
+
+The ridden surface is a primary determinant of cycling comfort and
+safety: a paved cycleway can be ridden effortlessly, whereas loose
+gravel or bare soil is strenuous and, on a road bike, potentially
+hazardous. Ground detection therefore assigns each sampled frame a
+single surface class and supplies the surface term of the bikeability
+score. Frames come from a handlebar-mounted camera at one frame per
+second; as each frame is dominated by one surface, the task is
+single-label image classification, not segmentation.
+
+\subsection{Task Definition and Model Selection}
+Two model families can solve this task without an existing labeled
+corpus: a classifier \emph{trained on our own labels}, or a
+\emph{zero-shot} vision-language model (VLM). We avoid a self-trained
+classifier, as it would need a large, balanced, manually labeled
+training set, careful regularization on limited data, and complete
+re-training whenever the class definitions change. A zero-shot VLM of
+the CLIP family \cite{clip} instead classifies an image from its
+similarity to natural-language class descriptions, so the taxonomy can
+be adapted by editing text -- without task-specific training.
+
+One distinction is often blurred: \emph{linear probing} of
+self-supervised features (e.g., DINOv2 \cite{dinov2}) is \emph{not}
+zero-shot -- its linear head is fitted on labeled target data and is
+therefore supervised; it is excluded here and would only qualify as a
+declared supervised baseline.
+
+\subsection{Surface Classes and Prompts}
+We distinguish four cycling-relevant classes: \textbf{Cycleway} (a
+dedicated paved bike path), \textbf{Road} (a paved road for motor
+traffic), \textbf{Gravel} (loose crushed stone), and \textbf{Unpaved}
+(soil, mud, or field tracks). Each class is described by several English
+prompts whose normalized text embeddings are averaged (\emph{prompt
+ensembling}). Since Cycleway and Road share the same smooth-asphalt
+texture, the prompts encode the \emph{discriminating context} -- a
+narrow separated lane with bicycle markings versus a wide multi-lane
+road -- to push the two embeddings apart. A frame is assigned to the
+class of highest cosine similarity via a softmax.
+
+\subsection{Evaluation Protocol}
+We compare nine open CLIP-family models of light to medium size through
+the unified \texttt{open\_clip} API \cite{openclip}: OpenAI CLIP,
+OpenCLIP (LAION-2B, DataComp-XL) \cite{datacomp}, SigLIP \cite{siglip},
+MobileCLIP \cite{mobileclip}, and EVA-CLIP \cite{evaclip}. Both
+\emph{accuracy} and \emph{latency} matter for on-bike use. For the
+quantitative evaluation we manually labeled more than $1{,}700$ frames
+from self-recorded rides; frames without a clear surface were tagged
+\emph{unclear/other} and excluded. As the classes are imbalanced, we
+report accuracy, balanced accuracy and macro-F1 with $95\%$ bootstrap
+confidence intervals and McNemar tests; latency is measured at batch
+size~1 with warm-up runs (ms/frame and FPS).
+
+\subsection{Results}
+Table~\ref{tab:ground_results} lists the outcome, sorted by macro-F1.
+The best model, \textbf{OpenCLIP ViT-B/32 (LAION-2B)}, reaches macro-F1
+$0.58$ at only $115$\,ms/frame -- the best accuracy-latency trade-off.
+Two points stand out. First, the highest plain \emph{accuracy}
+($0.78$, CLIP ViT-B/16) does \emph{not} give the highest macro-F1:
+accuracy rewards the majority classes, whereas macro-F1 weights all four
+surfaces equally and is the more faithful measure on imbalanced data.
+Consistently, OpenCLIP ViT-B/32 (LAION-2B) also attains the clearly
+highest balanced accuracy ($0.72$ vs.\ $\le\!0.70$ for every other
+model). Second, the $95\%$ bootstrap accuracy intervals of the leading
+models overlap, so their differences are \emph{not} statistically
+significant; only CLIP ViT-L/14 ($428$\,M) falls clearly below them --
+despite being the largest model it is both slowest and weakest ($0.42$
+macro-F1), confirming that capacity alone does not help. As
+Fig.~\ref{fig:confusion} shows, the residual errors concentrate on the
+Cycleway/Road pair (both smooth asphalt) and on the rare Gravel and
+Unpaved classes, which hold only $51$ and $13$ labeled frames and thus
+cap the macro-F1 at $0.58$ -- still sufficient for one of three
+sub-scores. We therefore adopt OpenCLIP ViT-B/32 (LAION-2B) as the
+ground detector. As all models share the same input and
+\texttt{open\_clip} pipeline, the differences reflect architecture and
+training data; the CPU latencies are hardware-dependent.
+
+\begin{table}[!t]
+\caption{Zero-shot surface-classification benchmark on the self-labeled
+test set ($>\!1{,}700$ frames), sorted by macro-F1. BAcc: balanced
+accuracy; latency at batch size~1.}
+\label{tab:ground_results}
+\centering
+\small
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\textbf{Model} & \textbf{P[M]} & \textbf{Acc} & \textbf{BAcc} & \textbf{mF1}
+  & \textbf{ms} & \textbf{FPS}\\
+\midrule
+OpenCLIP B/32 (LAION-2B)   & 151 & 0.75 & \textbf{0.72} & \textbf{0.58} & 115 & 8.7\\
+SigLIP B/16 (WebLI)        & 203 & 0.75 & 0.62 & 0.57 & 259 & 3.9\\
+CLIP B/16 (OpenAI)         & 150 & \textbf{0.78} & 0.62 & 0.57 & 261 & 3.8\\
+MobileCLIP-S2              & 99  & 0.73 & 0.70 & 0.56 & 304 & 3.3\\
+CLIP B/32 (OpenAI)         & 151 & 0.70 & 0.60 & 0.54 & 93  & 10.7\\
+EVA02-B/16                 & 150 & 0.76 & 0.62 & 0.54 & 304 & 3.3\\
+OpenCLIP B/32 (DataComp-XL)& 151 & 0.75 & 0.65 & 0.52 & 125 & 8.0\\
+CLIP L/14 (OpenAI)         & 428 & 0.64 & 0.50 & 0.42 & 929 & 1.1\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.74\columnwidth]{images/fig_confusion_best.pdf}
+\caption{Row-normalized confusion matrix of the best model (OpenCLIP
+ViT-B/32, LAION-2B) on the labeled test set. Each cell shows the count
+and the row share; the diagonal is correct. Errors concentrate on the
+Cycleway/Road pair and the rare Gravel/Unpaved classes.}
+\label{fig:confusion}
+\end{figure}
+
+% =====================================================================
+% PAGE 3 -- OBJECT DETECTION (not Bünyamin -- heading only)
+% =====================================================================
+
+\clearpage
+\section{Object Detection}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% PAGE 4 -- ENVIRONMENT DETECTION (not Bünyamin -- heading only)
+% =====================================================================
+
+\clearpage
+\section{Environment Detection}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% PAGE 5 -- BIKEABILITY SCORE (Bünyamin Aydemir)
+% =====================================================================
+
+\clearpage
+\section{Computation of the Bikeability Score}
+
+The bikeability score combines the three sub-components -- surface
+(ground detection), environment (environment detection), and objects
+(object detection) -- into a single value in the interval $[0, 100]$.
+Every detector emits a fixed-length \emph{vector}; each vector is first
+mapped to a \emph{sub-score} in $[0,1]$, and the three sub-scores are
+then combined by a weighted mean.
+
+\subsection{Detector Outputs as Vectors}
+The three detectors deliberately use different but fixed output
+representations, each aligned element-by-element with a stored value
+vector:
+\begin{itemize}
+\item \textbf{Ground} -- a one-hot vector $\mathbf{g}\in\{0,1\}^{4}$ over
+  the classes (Cycleway, Road, Gravel, Unpaved); exactly one entry is
+  $1$.
+\item \textbf{Environment} -- a vector of area fractions
+  $\mathbf{f}\in[0,1]^{3}$ over (vegetation, water, city).
+\item \textbf{Object} -- a vector of counts
+  $\mathbf{n}\in\mathbb{Z}_{\ge 0}^{3}$ over (bicycle, car, traffic
+  light).
+\end{itemize}
+
+\subsection{Overall Formula}
+For each evaluated frame, the score $A$ results from the weighted mean
+of the three sub-scores:
+\begin{equation}
+\label{eq:score}
+A = 100 \cdot \Big( w_g \, S_{\text{ground}}
+                  + w_e \, S_{\text{env}}
+                  + w_o \, S_{\text{object}} \Big),
+\end{equation}
+with the weights
+\begin{equation}
+\label{eq:weights}
+w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35,
+\quad w_g + w_e + w_o = 1.
+\end{equation}
+Since all sub-scores lie in $[0,1]$ and the weights sum to $1$, the
+score is \emph{guaranteed} to be bounded to $[0, 100]$.
+
+\subsection{Ground Sub-Score}
+The ground sub-score is the inner product of the one-hot vector
+$\mathbf{g}$ with the surface quality vector
+$\mathbf{q}^{g}=(1.0,\,0.7,\,0.3,\,0.1)$ (Table~\ref{tab:quality}):
+\begin{equation}
+\label{eq:ground}
+S_{\text{ground}} = \langle \mathbf{g},\, \mathbf{q}^{g}\rangle
+                  = \sum_{k} g_k\, q^{g}_{k}.
+\end{equation}
+Because $\mathbf{g}$ is one-hot, this simply selects the quality of the
+detected surface class.
+
+\subsection{Environment Sub-Score}
+The environment sub-score is the fraction-weighted mean of the
+environment quality vector $\mathbf{q}^{e}=(1.0,\,1.0,\,0.4)$:
+\begin{equation}
+\label{eq:env}
+S_{\text{env}} =
+\begin{cases}
+\dfrac{\langle \mathbf{f},\, \mathbf{q}^{e}\rangle}{\sum_{k} f_k},
+  & \text{if } \sum_{k} f_k > 0,\\[2ex]
+0.5, & \text{otherwise.}
+\end{cases}
+\end{equation}
+The normalization by $\sum_k f_k$ keeps the sub-score in $[0,1]$ even
+when the detected fractions do not cover the whole frame; a neutral
+value of $0.5$ is used if no environment class is detected.
+
+\subsection{Object Sub-Score}
+The object sub-score maps the counts $\mathbf{n}$ through a
+\emph{saturation function} using the penalty vector
+$\boldsymbol{\lambda}=(-0.2,\,1.0,\,0.3)$:
+\begin{equation}
+\label{eq:object}
+S_{\text{object}} = \exp\!\Big( -\max\big(\rho, 0\big) \Big),
+\qquad
+\rho = \frac{1}{N}\,\langle \mathbf{n},\, \boldsymbol{\lambda}\rangle,
+\end{equation}
+with the number of aggregated frames $N$ (here $N=1$ per frame). A
+positive penalty for cars ($+1.0$) and traffic lights ($+0.3$) lowers
+the sub-score, while bicycle-friendly objects such as other cyclists
+carry a \emph{negative} factor ($-0.2$) and raise it. The exponential
+form is robust against outliers, so a single crowded frame cannot
+dominate the overall score.
+
+\begin{table}[!t]
+\caption{Class value vectors for the three sub-scores: surface quality
+$\mathbf{q}^{g}$, environment quality $\mathbf{q}^{e}$, and object
+penalty $\boldsymbol{\lambda}$ (heuristic).}
+\label{tab:quality}
+\centering
+\begin{tabular}{@{}llc@{}}
+\toprule
+\textbf{Component} & \textbf{Class} & \textbf{Value}\\
+\midrule
+\multirow{4}{*}{Ground $\mathbf{q}^{g}$}
+  & Cycleway & $1.0$\\
+  & Road     & $0.7$\\
+  & Gravel   & $0.3$\\
+  & Unpaved  & $0.1$\\
+\midrule
+\multirow{3}{*}{Environment $\mathbf{q}^{e}$}
+  & Vegetation & $1.0$\\
+  & Water      & $1.0$\\
+  & City       & $0.4$\\
+\midrule
+\multirow{3}{*}{Object penalty $\boldsymbol{\lambda}$}
+  & Bicycle       & $-0.2$\\
+  & Car           & $+1.0$\\
+  & Traffic light & $+0.3$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Route Processing over the Full Ride}
+The action camera splits one continuous recording into several files
+(e.g., \texttt{DJI\_0408}, \texttt{DJI\_0409}, \dots). All parts are
+processed as a \emph{single} continuous video: the files are ordered
+chronologically by the number in their name, and a cumulative time
+offset (the sum of the previous parts' durations) keeps the timeline
+gap-free across file boundaries. Within each part, one frame is sampled
+every $5$\,s by \emph{seeking} directly to the target frame index
+instead of decoding every frame, which removes almost all of the
+decoding work. The three detectors are loaded once and evaluated in
+batches; for every sampled frame, the three output vectors and the
+resulting score are written to a shared CSV (frame name, continuous
+time in seconds and \texttt{HH:MM:SS}, an optional absolute ISO
+timestamp, the serialized vectors, and the score).
+
+\subsection{GPX Mapping and Visualization}
+Because the camera clock is unreliable, the frames are aligned to the
+GPS track by a single \emph{manual sync point} (by default: recording
+start $=$ GPX track start). Each frame is then matched to its nearest
+GPX track point in time (a nearest-neighbor join within a $3$\,s
+tolerance), which assigns a latitude/longitude to every score. The
+\emph{average} bikeability score of the route is the mean over all $M$
+evaluated frames,
+\begin{equation}
+\label{eq:avg}
+\bar{A} = \frac{1}{M} \sum_{i=1}^{M} A_i .
+\end{equation}
+Finally, the route is drawn as a sequence of short segments, each
+colored by the local score on a red--orange--yellow--green scale
+(Fig.~\ref{fig:route}). For the example ride shown, the mean score is
+$\bar{A}\approx 85.5/100$: the track is predominantly green (good
+cycling conditions) with a few yellow/orange sections.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{images/bikeability_map.png}
+\caption{Bikeability score colored along the GPX route (red $=$ low,
+green $=$ high). Per-frame scores are matched to the nearest GPS track
+point via a manual sync point; the example ride has a mean score of
+$\bar{A}\approx 85.5/100$.}
+\label{fig:route}
+\end{figure}
+
+% =====================================================================
+% DISCUSSION (to be written later, heading only)
+% =====================================================================
+
+\section{Discussion}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% CONCLUSION (to be written later, heading only)
+% =====================================================================
+
+\section{Conclusion}
+% --- NOTE: This section will be written later. ---
+
+% =====================================================================
+% Bibliography
+% =====================================================================
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

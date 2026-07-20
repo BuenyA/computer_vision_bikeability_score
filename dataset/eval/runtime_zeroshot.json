@@ -1,1 +1,0 @@
-{"method": "zeroshot", "model": "clip-vit-b-32", "value": "softmax_prob", "prompts": "ensemble-3class", "n": 1567}

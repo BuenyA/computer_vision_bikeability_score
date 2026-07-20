@@ -1,0 +1,13 @@
+# Schlanke Abhängigkeiten für die Research-Skripte (Modellentwicklung & Evaluation).
+# Die vollständige Pipeline-Umgebung liegt in final_bikeability_score/requirements.txt.
+torch
+torchvision
+transformers
+open_clip_torch
+ultralytics
+opencv-python
+numpy
+pandas
+pillow
+scikit-learn
+matplotlib

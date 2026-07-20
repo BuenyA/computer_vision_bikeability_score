@@ -1,0 +1,1 @@
+{"method": "semseg", "model": "segformer-ade->env", "value": "area_fraction", "n": 1567, "ms_per_frame_both": 45.7}

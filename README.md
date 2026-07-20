@@ -148,6 +148,27 @@ cv2.destroyAllWindows()
 
 ## 5. Installation & Nutzung
 
+### Projektstruktur
+
+```
+├── README.md
+├── final_bikeability_score/     # Finale Pipeline (Deliverable)
+│   ├── bikeability_score.ipynb  # Haupt-Notebook (End-to-End Score)
+│   ├── detectors/               # Ground-/Environment-/Object-Detektoren (+ env_model.py)
+│   ├── requirements.txt         # Vollständige Abhängigkeiten der Pipeline
+│   ├── yolo26m.pt               # YOLO-Gewichte
+│   └── dataset/                 # Finaler Datensatz (raw/-Video + bikeability_scores.csv)
+├── research/                    # Experimente & Modellentwicklung
+│   ├── environment_model/       # SegFormer (Environment)
+│   ├── ground_detection/        # Oberflächen-/Straßenerkennung
+│   ├── Object_Detection/        # YOLO-Experimente
+│   ├── other/                   # Vorverarbeitung, GPX-Merge, etc.
+│   ├── models/segformer_env/    # Trainiertes SegFormer-Modell (von final referenziert)
+│   ├── dataset/                 # Beispiel-/Evaluationsdaten (eval, frames, test_images, gpx_data)
+│   └── requirements.txt         # Schlanke Abhängigkeiten für die Research-Skripte
+└── paper/                       # LaTeX-Quellen des Papers
+```
+
 ### 5.1 Repository klonen
 
 ```bash
@@ -159,7 +180,8 @@ cd computer_vision_bikeability_score
 
 Damit alle Entwickler:innen mit denselben Paket-Versionen arbeiten, wird pro Person eine
 **lokale** virtuelle Umgebung erstellt. Der `.venv/`-Ordner wird **nicht** ins Repository
-eingecheckt (siehe `.gitignore`) – committet wird nur die `requirements.txt`.
+eingecheckt (siehe `.gitignore`) – committet wird nur die `requirements.txt` (in
+`final_bikeability_score/`, bzw. `research/` für die Research-Skripte).
 
 Empfohlene Python-Version: **3.10+**.
 
@@ -172,8 +194,8 @@ python -m venv .venv
 # venv aktivieren
 .venv\Scripts\Activate.ps1
 
-# Abhängigkeiten installieren
-pip install -r requirements.txt
+# Abhängigkeiten installieren (finale Pipeline)
+pip install -r final_bikeability_score/requirements.txt
 ```
 
 > Falls die Aktivierung mit einem Ausführungsrichtlinien-Fehler abbricht, einmalig ausführen:
@@ -188,16 +210,18 @@ python3 -m venv .venv
 # venv aktivieren
 source .venv/bin/activate
 
-# Abhängigkeiten installieren
-pip install -r requirements.txt
+# Abhängigkeiten installieren (finale Pipeline)
+pip install -r final_bikeability_score/requirements.txt
 ```
+
+> Für die Research-Skripte genügt die schlanke `research/requirements.txt`.
 
 Zum Deaktivieren der Umgebung jederzeit `deactivate` ausführen.
 
 ### 5.3 Notebook starten
 
 ```bash
-jupyter lab notebooks/
+jupyter lab final_bikeability_score/bikeability_score.ipynb
 ```
 
 > **Hinweis zur Reproduzierbarkeit:** Neue Pakete bitte mit fixierter Version in die
