@@ -9,6 +9,7 @@
 \usepackage{url}
 \usepackage{verbatim}
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage[T1]{fontenc}
@@ -70,9 +71,9 @@ safety: a paved cycleway can be ridden effortlessly, whereas loose
 gravel or bare soil is strenuous and, on a road bike, potentially
 hazardous. Ground detection therefore assigns each sampled frame a
 single surface class and supplies the surface term of the bikeability
-score. Frames come from a handlebar-mounted camera at one frame per
-second; as each frame is dominated by one surface, the task is
-single-label image classification, not segmentation.
+score. Frames come from a handlebar-mounted camera, sampled at one
+frame every five seconds; as each frame is dominated by one surface,
+the task is single-label image classification, not segmentation.
 
 \subsection{Task Definition and Model Selection}
 Two model families can solve this task without an existing labeled
@@ -235,8 +236,17 @@ with the weights
 w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35,
 \quad w_g + w_e + w_o = 1.
 \end{equation}
-Since all sub-scores lie in $[0,1]$ and the weights sum to $1$, the
-score is \emph{guaranteed} to be bounded to $[0, 100]$.
+The weights are heuristic and follow two considerations. Environment
+and object exposure jointly capture how pleasant and how safe a stretch
+feels -- the factors a cyclist perceives most directly -- and therefore
+receive the larger share ($w_e + w_o = 0.80$). The surface receives the
+smallest weight ($w_g = 0.20$): on typical routes it varies little, and
+ground detection is also the least reliable component (macro-F1
+$0.58$), so a smaller weight limits the influence of its errors. Since
+all sub-scores lie in $[0,1]$ and the weights sum to $1$, the score is
+bounded to $[0, 100]$; in practice the extremes $0$ and $100$ are never
+reached, as $S_{\text{ground}}\ge 0.1$ and
+$S_{\text{object}}=\exp(-\max(\rho,0))>0$.
 
 \subsection{Ground Sub-Score}
 The ground sub-score is the inner product of the one-hot vector
@@ -274,19 +284,25 @@ $\boldsymbol{\lambda}=(-0.2,\,1.0,\,0.3)$:
 \label{eq:object}
 S_{\text{object}} = \exp\!\Big( -\max\big(\rho, 0\big) \Big),
 \qquad
-\rho = \frac{1}{N}\,\langle \mathbf{n},\, \boldsymbol{\lambda}\rangle,
+\rho = \langle \mathbf{n},\, \boldsymbol{\lambda}\rangle,
 \end{equation}
-with the number of aggregated frames $N$ (here $N=1$ per frame). A
-positive penalty for cars ($+1.0$) and traffic lights ($+0.3$) lowers
-the sub-score, while bicycle-friendly objects such as other cyclists
-carry a \emph{negative} factor ($-0.2$) and raise it. The exponential
-form is robust against outliers, so a single crowded frame cannot
+where $\rho$ is evaluated independently per frame. A positive factor
+for cars ($+1.0$) and traffic lights ($+0.3$) makes
+$\rho$ positive and thus lowers the sub-score, whereas bicycles carry a
+\emph{negative} factor ($-0.2$). The clamp $\max(\rho, 0)$ makes the
+score asymmetric: a frame is never rewarded \emph{above} the neutral
+value $1.0$, so bicycles do not inflate the score on their own -- they
+only \emph{offset} the penalty of nearby cars or traffic lights. This
+encodes the intuition that good cycling conditions are the default and
+only motorised traffic degrades them. The exponential form additionally
+caps the influence of outliers, so a single crowded frame cannot
 dominate the overall score.
 
 \begin{table}[!t]
 \caption{Class value vectors for the three sub-scores: surface quality
 $\mathbf{q}^{g}$, environment quality $\mathbf{q}^{e}$, and object
-penalty $\boldsymbol{\lambda}$ (heuristic).}
+weight $\boldsymbol{\lambda}$ (heuristic; a negative value acts as a
+bonus).}
 \label{tab:quality}
 \centering
 \begin{tabular}{@{}llc@{}}
@@ -304,7 +320,7 @@ penalty $\boldsymbol{\lambda}$ (heuristic).}
   & Water      & $1.0$\\
   & City       & $0.4$\\
 \midrule
-\multirow{3}{*}{Object penalty $\boldsymbol{\lambda}$}
+\multirow{3}{*}{Object weight $\boldsymbol{\lambda}$}
   & Bicycle       & $-0.2$\\
   & Car           & $+1.0$\\
   & Traffic light & $+0.3$\\
@@ -332,20 +348,18 @@ Because the camera clock is unreliable, the frames are aligned to the
 GPS track by a single \emph{manual sync point} (by default: recording
 start $=$ GPX track start). Each frame is then matched to its nearest
 GPX track point in time (a nearest-neighbor join within a $3$\,s
-tolerance), which assigns a latitude/longitude to every score. The
-\emph{average} bikeability score of the route is the mean over all $M$
-evaluated frames,
-\begin{equation}
-\label{eq:avg}
-\bar{A} = \frac{1}{M} \sum_{i=1}^{M} A_i .
-\end{equation}
+tolerance -- large enough to bridge gaps in the roughly $1$\,Hz GPS
+log, yet below the $5$\,s frame spacing so that each frame maps to a
+distinct track point), which assigns a latitude/longitude to every
+score. The \emph{average} bikeability score of the route is the mean
+$\bar{A} = \frac{1}{M}\sum_{i=1}^{M} A_i$ over all $M$ evaluated frames.
 Finally, the route is drawn as a sequence of short segments, each
 colored by the local score on a red--orange--yellow--green scale
 (Fig.~\ref{fig:route}). For the example ride shown, the mean score is
 $\bar{A}\approx 85.5/100$: the track is predominantly green (good
 cycling conditions) with a few yellow/orange sections.
 
-\begin{figure}[!t]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{images/bikeability_map.png}
 \caption{Bikeability score colored along the GPX route (red $=$ low,
