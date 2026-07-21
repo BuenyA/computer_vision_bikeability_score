@@ -27,11 +27,6 @@ A.~Radford, J.~W. Kim, C.~Hallacy, A.~Ramesh, G.~Goh, S.~Agarwal, G.~Sastry,
   transferable visual models from natural language supervision,'' in
   \emph{Proc. Int. Conf. Machine Learning (ICML)}, 2021, pp. 8748--8763.
 
-\bibitem{dinov2}
-M.~Oquab, T.~Darcet, T.~Moutakanni \emph{et~al.}, ``{DINOv2}: Learning robust
-  visual features without supervision,'' \emph{Trans. Machine Learning Research
-  (TMLR)}, 2024.
-
 \bibitem{openclip}
 G.~Ilharco, M.~Wortsman, R.~Wightman, C.~Gordon, N.~Carlini, R.~Taori, A.~Dave,
   V.~Shankar, H.~Namkoong, J.~Miller, H.~Hajishirzi, A.~Farhadi, and

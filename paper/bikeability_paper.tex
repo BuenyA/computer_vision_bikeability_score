@@ -64,82 +64,82 @@ CLIP, surface classification, object detection, GPX.
 % =====================================================================
 
 \clearpage
-\section{Ground Detection: Road-Surface Classification}
+\section{Road-Surface Classification}
 
-The ridden surface is a primary determinant of cycling comfort and
-safety: a paved cycleway can be ridden effortlessly, whereas loose
-gravel or bare soil is strenuous and, on a road bike, potentially
-hazardous. Ground detection therefore assigns each sampled frame a
-single surface class and supplies the surface term of the bikeability
-score. Frames come from a handlebar-mounted camera, sampled at one
-frame every five seconds; as each frame is dominated by one surface,
-the task is single-label image classification, not segmentation.
+The ridden surface strongly affects cycling comfort and safety: a paved
+cycleway is effortless, whereas loose gravel or bare soil is strenuous
+and, on a road bike, hazardous. Ground detection assigns each sampled
+frame a single surface class and supplies the surface term of the
+score. Frames come from a handlebar-mounted camera at one frame every
+five seconds; as each is dominated by one surface, the task is
+single-label classification, not segmentation.
 
 \subsection{Task Definition and Model Selection}
 Two model families can solve this task without an existing labeled
 corpus: a classifier \emph{trained on our own labels}, or a
 \emph{zero-shot} vision-language model (VLM). We avoid a self-trained
-classifier, as it would need a large, balanced, manually labeled
-training set, careful regularization on limited data, and complete
-re-training whenever the class definitions change. A zero-shot VLM of
-the CLIP family \cite{clip} instead classifies an image from its
-similarity to natural-language class descriptions, so the taxonomy can
-be adapted by editing text -- without task-specific training.
-
-One distinction is often blurred: \emph{linear probing} of
-self-supervised features (e.g., DINOv2 \cite{dinov2}) is \emph{not}
-zero-shot -- its linear head is fitted on labeled target data and is
-therefore supervised; it is excluded here and would only qualify as a
-declared supervised baseline.
+classifier, which would need a large, balanced, manually labeled
+training set and re-training on every change of the class definitions.
+A zero-shot VLM of the CLIP family \cite{clip} instead classifies an
+image by its similarity to natural-language class descriptions, so the
+taxonomy is adapted by editing text alone.
 
 \subsection{Surface Classes and Prompts}
 We distinguish four cycling-relevant classes: \textbf{Cycleway} (a
 dedicated paved bike path), \textbf{Road} (a paved road for motor
 traffic), \textbf{Gravel} (loose crushed stone), and \textbf{Unpaved}
 (soil, mud, or field tracks). Each class is described by several English
-prompts whose normalized text embeddings are averaged (\emph{prompt
-ensembling}). Since Cycleway and Road share the same smooth-asphalt
-texture, the prompts encode the \emph{discriminating context} -- a
-narrow separated lane with bicycle markings versus a wide multi-lane
-road -- to push the two embeddings apart. A frame is assigned to the
-class of highest cosine similarity via a softmax.
+prompts whose normalized embeddings are averaged (\emph{prompt
+ensembling}). As Cycleway and Road share the same smooth asphalt, the
+prompts encode the \emph{discriminating context} (a narrow separated
+bicycle lane versus a wide multi-lane road) to separate the two
+embeddings. A frame is assigned to the class of highest cosine
+similarity.
 
 \subsection{Evaluation Protocol}
 We compare nine open CLIP-family models of light to medium size through
 the unified \texttt{open\_clip} API \cite{openclip}: OpenAI CLIP,
 OpenCLIP (LAION-2B, DataComp-XL) \cite{datacomp}, SigLIP \cite{siglip},
-MobileCLIP \cite{mobileclip}, and EVA-CLIP \cite{evaclip}. Both
+MobileCLIP \cite{mobileclip}, and EVA-CLIP \cite{evaclip}; both
 \emph{accuracy} and \emph{latency} matter for on-bike use. For the
 quantitative evaluation we manually labeled more than $1{,}700$ frames
-from self-recorded rides; frames without a clear surface were tagged
-\emph{unclear/other} and excluded. As the classes are imbalanced, we
-report accuracy, balanced accuracy and macro-F1 with $95\%$ bootstrap
-confidence intervals and McNemar tests; latency is measured at batch
-size~1 with warm-up runs (ms/frame and FPS).
+from self-recorded rides, excluding frames without a clear surface. As
+the classes are imbalanced, we report accuracy, balanced accuracy and
+macro-F1 with $95\%$ bootstrap confidence intervals and McNemar tests;
+latency is measured at batch size~1 with warm-up runs (ms/frame and
+FPS).
 
 \subsection{Results}
 Table~\ref{tab:ground_results} lists the outcome, sorted by macro-F1.
 The best model, \textbf{OpenCLIP ViT-B/32 (LAION-2B)}, reaches macro-F1
-$0.58$ at only $115$\,ms/frame -- the best accuracy-latency trade-off.
+$0.58$ at only $115$\,ms/frame, the best accuracy-latency trade-off.
 Two points stand out. First, the highest plain \emph{accuracy}
 ($0.78$, CLIP ViT-B/16) does \emph{not} give the highest macro-F1:
 accuracy rewards the majority classes, whereas macro-F1 weights all four
 surfaces equally and is the more faithful measure on imbalanced data.
-Consistently, OpenCLIP ViT-B/32 (LAION-2B) also attains the clearly
-highest balanced accuracy ($0.72$ vs.\ $\le\!0.70$ for every other
-model). Second, the $95\%$ bootstrap accuracy intervals of the leading
+Second, the $95\%$ bootstrap accuracy intervals of the leading
 models overlap, so their differences are \emph{not} statistically
-significant; only CLIP ViT-L/14 ($428$\,M) falls clearly below them --
-despite being the largest model it is both slowest and weakest ($0.42$
-macro-F1), confirming that capacity alone does not help. As
-Fig.~\ref{fig:confusion} shows, the residual errors concentrate on the
-Cycleway/Road pair (both smooth asphalt) and on the rare Gravel and
-Unpaved classes, which hold only $51$ and $13$ labeled frames and thus
-cap the macro-F1 at $0.58$ -- still sufficient for one of three
-sub-scores. We therefore adopt OpenCLIP ViT-B/32 (LAION-2B) as the
-ground detector. As all models share the same input and
-\texttt{open\_clip} pipeline, the differences reflect architecture and
-training data; the CPU latencies are hardware-dependent.
+significant; only CLIP ViT-L/14 ($428$\,M) falls clearly below them;
+the largest model is both slowest and weakest ($0.42$ macro-F1),
+confirming that capacity alone does not help.
+
+Broken down per class, the best model scores F1 $0.80$ (Cycleway) and
+$0.73$ (Road) but only $0.45$ (Gravel) and $0.33$ (Unpaved); as
+macro-F1 averages the four equally, the two strong classes are pulled
+down by the two weak ones (Fig.~\ref{fig:confusion}). Crucially, the
+weakness is one of \emph{precision}, not recall: Unpaved is still
+recalled well ($0.77$), yet its precision collapses to $0.21$ because,
+with only $13$ true frames, a few false positives bleeding in from the
+majority classes suffice to ruin it; Gravel ($51$ frames) behaves the
+same way, while the residual Cycleway/Road confusion (both smooth
+asphalt) is comparatively minor. A macro-F1 of $0.58$ is thus by
+design strict on such tiny classes; the accuracy ($0.75$) and balanced
+accuracy ($0.72$, the highest of all models) are more flattering yet
+still fair, and for a zero-shot classifier on strongly imbalanced data
+the result is solid. We therefore adopt OpenCLIP ViT-B/32 (LAION-2B) as
+the ground detector; as all models share the same pipeline, the
+differences reflect architecture and training data (latencies are
+hardware-dependent).
 
 \begin{table}[!t]
 \caption{Zero-shot surface-classification benchmark on the self-labeled
@@ -166,9 +166,9 @@ CLIP L/14 (OpenAI)         & 428 & 0.64 & 0.50 & 0.42 & 929 & 1.1\\
 \end{tabular}
 \end{table}
 
-\begin{figure}[!t]
+\begin{figure}[!b]
 \centering
-\includegraphics[width=0.74\columnwidth]{images/fig_confusion_best.pdf}
+\includegraphics[width=0.79\columnwidth]{images/fig_confusion_best.pdf}
 \caption{Row-normalized confusion matrix of the best model (OpenCLIP
 ViT-B/32, LAION-2B) on the labeled test set. Each cell shows the count
 and the row share; the diagonal is correct. Errors concentrate on the
@@ -199,9 +199,9 @@ Cycleway/Road pair and the rare Gravel/Unpaved classes.}
 \clearpage
 \section{Computation of the Bikeability Score}
 
-The bikeability score combines the three sub-components -- surface
-(ground detection), environment (environment detection), and objects
-(object detection) -- into a single value in the interval $[0, 100]$.
+The bikeability score combines the three sub-components (surface from
+ground detection, environment from environment detection, and objects
+from object detection) into a single value in the interval $[0, 100]$.
 Every detector emits a fixed-length \emph{vector}; each vector is first
 mapped to a \emph{sub-score} in $[0,1]$, and the three sub-scores are
 then combined by a weighted mean.
@@ -211,12 +211,12 @@ The three detectors deliberately use different but fixed output
 representations, each aligned element-by-element with a stored value
 vector:
 \begin{itemize}
-\item \textbf{Ground} -- a one-hot vector $\mathbf{g}\in\{0,1\}^{4}$ over
+\item \textbf{Ground}: a one-hot vector $\mathbf{g}\in\{0,1\}^{4}$ over
   the classes (Cycleway, Road, Gravel, Unpaved); exactly one entry is
   $1$.
-\item \textbf{Environment} -- a vector of area fractions
+\item \textbf{Environment}: a vector of area fractions
   $\mathbf{f}\in[0,1]^{3}$ over (vegetation, water, city).
-\item \textbf{Object} -- a vector of counts
+\item \textbf{Object}: a vector of counts
   $\mathbf{n}\in\mathbb{Z}_{\ge 0}^{3}$ over (bicycle, car, traffic
   light).
 \end{itemize}
@@ -238,7 +238,7 @@ w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35,
 \end{equation}
 The weights are heuristic and follow two considerations. Environment
 and object exposure jointly capture how pleasant and how safe a stretch
-feels -- the factors a cyclist perceives most directly -- and therefore
+feels, the factors a cyclist perceives most directly, and therefore
 receive the larger share ($w_e + w_o = 0.80$). The surface receives the
 smallest weight ($w_g = 0.20$): on typical routes it varies little, and
 ground detection is also the least reliable component (macro-F1
@@ -291,7 +291,7 @@ for cars ($+1.0$) and traffic lights ($+0.3$) makes
 $\rho$ positive and thus lowers the sub-score, whereas bicycles carry a
 \emph{negative} factor ($-0.2$). The clamp $\max(\rho, 0)$ makes the
 score asymmetric: a frame is never rewarded \emph{above} the neutral
-value $1.0$, so bicycles do not inflate the score on their own -- they
+value $1.0$, so bicycles do not inflate the score on their own; they
 only \emph{offset} the penalty of nearby cars or traffic lights. This
 encodes the intuition that good cycling conditions are the default and
 only motorised traffic degrades them. The exponential form additionally
@@ -328,27 +328,12 @@ bonus).}
 \end{tabular}
 \end{table}
 
-\subsection{Route Processing over the Full Ride}
-The action camera splits one continuous recording into several files
-(e.g., \texttt{DJI\_0408}, \texttt{DJI\_0409}, \dots). All parts are
-processed as a \emph{single} continuous video: the files are ordered
-chronologically by the number in their name, and a cumulative time
-offset (the sum of the previous parts' durations) keeps the timeline
-gap-free across file boundaries. Within each part, one frame is sampled
-every $5$\,s by \emph{seeking} directly to the target frame index
-instead of decoding every frame, which removes almost all of the
-decoding work. The three detectors are loaded once and evaluated in
-batches; for every sampled frame, the three output vectors and the
-resulting score are written to a shared CSV (frame name, continuous
-time in seconds and \texttt{HH:MM:SS}, an optional absolute ISO
-timestamp, the serialized vectors, and the score).
-
 \subsection{GPX Mapping and Visualization}
 Because the camera clock is unreliable, the frames are aligned to the
 GPS track by a single \emph{manual sync point} (by default: recording
 start $=$ GPX track start). Each frame is then matched to its nearest
 GPX track point in time (a nearest-neighbor join within a $3$\,s
-tolerance -- large enough to bridge gaps in the roughly $1$\,Hz GPS
+tolerance: large enough to bridge gaps in the roughly $1$\,Hz GPS
 log, yet below the $5$\,s frame spacing so that each frame maps to a
 distinct track point), which assigns a latitude/longitude to every
 score. The \emph{average} bikeability score of the route is the mean

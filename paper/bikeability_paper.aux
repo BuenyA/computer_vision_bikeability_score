@@ -6,21 +6,20 @@
 \@writefile{toc}{\contentsline {section}{\numberline {II}Research Approach and Methodology}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {III}Objectives and Constraints}{1}{}\protected@file@percent }
 \citation{clip}
-\citation{dinov2}
 \citation{openclip}
 \citation{datacomp}
 \citation{siglip}
 \citation{mobileclip}
 \citation{evaclip}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Ground Detection: Road-Surface Classification}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Road-Surface Classification}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Task Definition and Model Selection}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Surface Classes and Prompts}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Evaluation Protocol}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Results}{2}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Zero-shot surface-classification benchmark on the self-labeled test set ($>\!1{,}700$ frames), sorted by macro-F1. BAcc: balanced accuracy; latency at batch size~1.}}{2}{}\protected@file@percent }
 \newlabel{tab:ground_results}{{I}{2}{}{table.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Row-normalized confusion matrix of the best model (OpenCLIP ViT-B/32, LAION-2B) on the labeled test set. Each cell shows the count and the row share; the diagonal is correct. Errors concentrate on the Cycleway/Road pair and the rare Gravel/Unpaved classes.}}{2}{}\protected@file@percent }
 \newlabel{fig:confusion}{{1}{2}{}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Results}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {V}Object Detection}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Environment Detection}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VII}Computation of the Bikeability Score}{5}{}\protected@file@percent }
@@ -36,17 +35,15 @@
 \newlabel{eq:env}{{4}{5}{}{equation.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-E}}Object Sub-Score}{5}{}\protected@file@percent }
 \newlabel{eq:object}{{5}{5}{}{equation.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-F}}Route Processing over the Full Ride}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-F}}GPX Mapping and Visualization}{5}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{clip}{1}
-\bibcite{dinov2}{2}
-\bibcite{openclip}{3}
-\bibcite{datacomp}{4}
-\bibcite{siglip}{5}
-\bibcite{mobileclip}{6}
-\bibcite{evaclip}{7}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-G}}GPX Mapping and Visualization}{6}{}\protected@file@percent }
+\bibcite{openclip}{2}
+\bibcite{datacomp}{3}
+\bibcite{siglip}{4}
+\bibcite{mobileclip}{5}
+\bibcite{evaclip}{6}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Bikeability score colored along the GPX route (red $=$ low, green $=$ high). Per-frame scores are matched to the nearest GPS track point via a manual sync point; the example ride has a mean score of $\bar  {A}\approx 85.5/100$.}}{6}{}\protected@file@percent }
 \newlabel{fig:route}{{2}{6}{}{figure.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VIII}Discussion}{6}{}\protected@file@percent }
