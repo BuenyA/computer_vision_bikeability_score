@@ -75,9 +75,9 @@ five seconds; as each is dominated by one surface, the task is
 single-label classification, not segmentation.
 
 \subsection{Task Definition and Model Selection}
-Two model families can solve this task without an existing labeled
-corpus: a classifier \emph{trained on our own labels}, or a
-\emph{zero-shot} vision-language model (VLM). We avoid a self-trained
+Two model families can solve this task: a classifier \emph{trained on
+our own labels}, or a \emph{zero-shot} vision-language model (VLM). We
+avoid a self-trained
 classifier, which would need a large, balanced, manually labeled
 training set and re-training on every change of the class definitions.
 A zero-shot VLM of the CLIP family \cite{clip} instead classifies an
@@ -168,7 +168,7 @@ CLIP L/14 (OpenAI)         & 428 & 0.64 & 0.50 & 0.42 & 929 & 1.1\\
 
 \begin{figure}[!b]
 \centering
-\includegraphics[width=0.79\columnwidth]{images/fig_confusion_best.pdf}
+\includegraphics[width=0.91\columnwidth]{images/fig_confusion_best.pdf}
 \caption{Row-normalized confusion matrix of the best model (OpenCLIP
 ViT-B/32, LAION-2B) on the labeled test set. Each cell shows the count
 and the row share; the diagonal is correct. Errors concentrate on the
@@ -199,16 +199,16 @@ Cycleway/Road pair and the rare Gravel/Unpaved classes.}
 \clearpage
 \section{Computation of the Bikeability Score}
 
-The bikeability score combines the three sub-components (surface from
-ground detection, environment from environment detection, and objects
-from object detection) into a single value in the interval $[0, 100]$.
+The bikeability score combines the three components (surface from
+ground-detection, environment from environment-detection, and objects
+from object-detection) into a single value in the interval $[0, 100]$.
 Every detector emits a fixed-length \emph{vector}; each vector is first
 mapped to a \emph{sub-score} in $[0,1]$, and the three sub-scores are
 then combined by a weighted mean.
 
 \subsection{Detector Outputs as Vectors}
 The three detectors deliberately use different but fixed output
-representations, each aligned element-by-element with a stored value
+representations, each aligned element by element with a stored value
 vector:
 \begin{itemize}
 \item \textbf{Ground}: a one-hot vector $\mathbf{g}\in\{0,1\}^{4}$ over
@@ -233,8 +233,7 @@ A = 100 \cdot \Big( w_g \, S_{\text{ground}}
 with the weights
 \begin{equation}
 \label{eq:weights}
-w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35,
-\quad w_g + w_e + w_o = 1.
+w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35.
 \end{equation}
 The weights are heuristic and follow two considerations. Environment
 and object exposure jointly capture how pleasant and how safe a stretch
@@ -244,9 +243,13 @@ smallest weight ($w_g = 0.20$): on typical routes it varies little, and
 ground detection is also the least reliable component (macro-F1
 $0.58$), so a smaller weight limits the influence of its errors. Since
 all sub-scores lie in $[0,1]$ and the weights sum to $1$, the score is
-bounded to $[0, 100]$; in practice the extremes $0$ and $100$ are never
+bounded to $[0, 100]$. In practice the lower extreme $0$ is never
 reached, as $S_{\text{ground}}\ge 0.1$ and
-$S_{\text{object}}=\exp(-\max(\rho,0))>0$.
+$S_{\text{object}}=\exp(-\max(\rho,0))>0$; the upper value $100$,
+however, does occur whenever all three sub-scores equal $1$
+simultaneously, e.g.\ on a paved cycleway ($S_{\text{ground}}=1$)
+through vegetation or along water ($S_{\text{env}}=1$) with no
+motorised traffic ($S_{\text{object}}=1$).
 
 \subsection{Ground Sub-Score}
 The ground sub-score is the inner product of the one-hot vector
@@ -298,7 +301,7 @@ only motorised traffic degrades them. The exponential form additionally
 caps the influence of outliers, so a single crowded frame cannot
 dominate the overall score.
 
-\begin{table}[!t]
+\begin{table}[H]
 \caption{Class value vectors for the three sub-scores: surface quality
 $\mathbf{q}^{g}$, environment quality $\mathbf{q}^{e}$, and object
 weight $\boldsymbol{\lambda}$ (heuristic; a negative value acts as a
