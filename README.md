@@ -1,285 +1,192 @@
-# Bikeability Score – Egocentric Vision für die automatisierte Bewertung von Radinfrastruktur
-
-> Masterprojekt im Modul **Bildverarbeitung und Bildverstehen**
-> Studiengang Data Science & AI – DHBW
+# A Computer-Vision-Based Bikeability Score
 
 Automatisierte Bewertung der Fahrradfreundlichkeit (*Bikeability*) von Streckenabschnitten
-auf Basis von egozentrischem Videomaterial (DJI-Kamera am Lenker). Aus den Videos werden
-mittels **Computer Vision** und **Deep Learning** (YOLO, HSV-Farbraumanalyse) Merkmale
-extrahiert und zu einem kontinuierlichen **Bikeability-Score (0–100)** pro Streckenabschnitt
-aggregiert.
+auf Basis von egozentrischem Videomaterial (DJI-Kamera am Lenker). Aus den Frames werden
+mit **Computer Vision** drei Merkmalsgruppen extrahiert und pro Frame zu einem
+kontinuierlichen **Bikeability-Score (0–100)** kombiniert.
 
 ---
 
 ## 1. Motivation & Zielsetzung
 
-Aktive Mobilität (Radverkehr) gewinnt für nachhaltige Stadtplanung zunehmend an Bedeutung.
-Klassische Bikeability-Indizes basieren auf manuellen Erhebungen oder Geodaten. Dieses Projekt
-untersucht, ob sich die **Attraktivität einer Fahrradstrecke automatisiert aus der
-Ich-Perspektive (Egocentric Vision)** ableiten lässt.
+Aktive Mobilität (Radverkehr) gewinnt für nachhaltige Stadtplanung an Bedeutung. Klassische
+Bikeability-Indizes basieren auf manuellen Erhebungen oder Geodaten. Dieses Projekt
+untersucht, ob sich die Attraktivität einer Fahrradstrecke automatisiert aus der
+Ich-Perspektive (Egocentric Vision) ableiten lässt.
 
-
-**Zielgröße:** Eine kontinuierliche Variable – der *Bikeability-Score* $A \in [0, 100]$ –
-pro Streckensegment (zeitbasiert: 10 s, oder distanzbasiert: 100 m).
-
-Das ursprüngliche Ziel (Erkennung von „Gefahrensituationen“) wurde verworfen, da es sich
-nicht trennscharf und reproduzierbar labeln lässt. Der Score-Ansatz liefert dagegen klar
-definierte, messbare Merkmale.
+**Zielgröße:** ein kontinuierlicher *Bikeability-Score* $A \in [0, 100]$ pro Frame, der über
+die GPS-Zeitachse auf den Streckenverlauf gemappt wird.
 
 ---
 
 ## 2. Datengrundlage
 
-| Eigenschaft        | Wert                                                        |
-| ------------------ | ----------------------------------------------------------- |
-| Aufnahmegerät      | DJI-Kamera, frontal am Fahrradlenker montiert               |
-| Umfang             | ca. 5–6 Stunden Videomaterial                               |
-| Perspektive        | Egocentric / First-Person View                              |
-| Segmentierung      | zeitbasiert (10 s) **oder** distanzbasiert (100 m)          |
-| GPS                | optional – ermöglicht kartenbasierte Visualisierung         |
+| Eigenschaft   | Wert                                                     |
+| ------------- | -------------------------------------------------------- |
+| Aufnahmegerät | DJI-Kamera, frontal am Fahrradlenker montiert            |
+| Umfang        | ca. 10-11 Stunden Videomaterial (in mehrere `.MP4` geteilt) |
+| Perspektive   | Egocentric / First-Person View                           |
+| Abtastung     | ein Frame alle **5 Sekunden**                            |
+| GPS           | GPX-Track – ermöglicht die kartenbasierte Visualisierung |
 
-> Bei z. B. 30 fps und ~20 km/h entspricht ein 100-m-Abschnitt ca. **540 Frames**, die zu
-> einem Feature-Vektor aggregiert werden.
-
-📦 **Bereits erstellter Datensatz:** [Google Drive](https://drive.google.com/drive/folders/1cMV4_znMxJ1V4L5ZnJUUq9dNIdBuOYaO?usp=sharing)
+📦 **Datensatz:** [Google Drive](https://drive.google.com/drive/folders/1cMV4_znMxJ1V4L5ZnJUUq9dNIdBuOYaO?usp=sharing)
 
 ---
 
 ## 3. Methodik
 
+Der Score setzt sich aus **drei Teilkomponenten** zusammen, die jeweils von einem eigenen
+Modell stammen. Alle Detektoren liegen in [final_bikeability_score/detectors](final_bikeability_score/detectors)
+und werden einmal geladen und pro Frame wiederverwendet.
+
+| Komponente             | Modell                                              | Ausgabe pro Frame                                  |
+| ---------------------- | --------------------------------------------------- | -------------------------------------------------- |
+| **Object Detection**   | YOLO (Ultralytics, `yolo26n.pt`)                    | Counts: `bicycle`, `car`, `traffic light`          |
+| **Ground Detection**   | OpenCLIP `ViT-B/32` (zero-shot, Prompt-Ensembling)  | One-Hot: `Cycleway`, `Road`, `Gravel`, `Unpaved`   |
+| **Environment**        | fine-tuned **SegFormer-B0** (semant. Segmentierung) | Flächenanteile: `vegetation`, `water`, `city`      |
+
 ### 3.1 Score-Modell
 
-Der Score wird als **gewichtete Summe** positiver und negativer Einflussfaktoren definiert:
+Die drei Subscores werden über feste Gewichte (Summe = 1) kombiniert; dadurch bleibt der
+Score **garantiert** in $[0, 100]$:
 
 $$
-A = \sum_i \left( w_i^{+} \cdot F_i^{+} \right) - \sum_j \left( w_j^{-} \cdot F_j^{-} \right)
+A = 100 \cdot \left( w_g \cdot S_{\text{ground}} + w_e \cdot S_{\text{env}} + w_o \cdot S_{\text{object}} \right)
 $$
 
-Alle Features werden auf $[0, 1]$ normalisiert und anschließend auf die Skala 0–100 abgebildet.
+mit $w_g = 0.20$, $w_e = 0.45$, $w_o = 0.35$.
 
-### 3.2 Feature-Extraktion
+- **Ground-Subscore** $S_{\text{ground}}$: Skalarprodukt des One-Hot-Vektors mit dem
+  Qualitätsvektor `[1.0, 0.7, 0.3, 0.1]` (Cycleway → Unpaved).
+- **Env-Subscore** $S_{\text{env}}$: mit den Flächenanteilen gewichtetes Mittel der
+  Klassenqualität `[1.0, 1.0, 0.4]` (vegetation, water, city); neutral `0.5`, falls keine
+  Klasse erkannt wird.
+- **Object-Subscore** $S_{\text{object}} = e^{-\max(0,\ \langle \text{counts}, \lambda\rangle)}$
+  mit Straf-/Bonusfaktoren `[-0.2, 1.0, 0.3]` – Räder wirken positiv, Autos am stärksten
+  negativ.
 
-| Parameter                    | CV-Methode                                  | Datentyp        | Einfluss        |
-| ---------------------------- | ------------------------------------------- | --------------- | --------------- |
-| Motorisierter Verkehr $V_m$  | YOLOv8 (Klassen: car, truck, bus)           | Integer (Count) | stark negativ   |
-| Vulnerable Teilnehmer $V_v$  | YOLOv8 (Klasse: person, bicycle)            | Integer (Count) | leicht negativ  |
-| Parkende Fahrzeuge $P_{door}$| YOLO (rechter Bildrand)                     | Integer (Count) | negativ         |
-| Fahrbahnoberfläche $O_{surf}$| CNN-Klassifikation (ResNet/EfficientNet)    | Kategorie       | negativ b. Schäden |
-| Effektive Spurbreite $B_{space}$ | Canny/Hough oder Segmentierung          | Float           | negativ b. Enge |
-| Grünvolumen-Index (GVI)      | HSV-Thresholding (obere Bildhälfte)         | Float (0–1)     | positiv         |
-| Sky View Factor (SVF)        | Maskensegmentierung Himmel                  | Float (0–1)     | positiv         |
+> Die Gewichte und Bewertungstabellen sind heuristisch gewählt.
 
-**Positive Features** (Score ↑): baulich getrennte, asphaltierte Radwege mit klarer
-Abgrenzung und breiter Spur; Grünanteil/Natur (Bäume, Parks, Wiesen); Aussicht (Seen, Berge).
-
-**Negative Features** (Score ↓): hohes motorisiertes Verkehrsaufkommen; Hindernisse
-(Blockaden, Schranken, Baustellen, Engstellen); schlechte Oberfläche (Kopfsteinpflaster,
-Schlaglöcher, Schotter).
-
-### 3.3 Pipeline
+### 3.2 Pipeline
 
 ```mermaid
 flowchart LR
-    A[DJI Video] --> B[Frame-Extraktion & Segmentierung]
-    B --> C[YOLO Objektdetektion]
-    B --> D[HSV Grünanteil-Analyse]
-    B --> E[CNN Oberflächen-Klassifikation]
-    C --> F[Feature-Aggregation pro Segment]
+    A[DJI Videoteile] --> B[Frame alle 5 s]
+    B --> C[YOLO: Objekt-Counts]
+    B --> D[OpenCLIP: Oberflächenklasse]
+    B --> E[SegFormer: Umgebungsanteile]
+    C --> F[Score-Berechnung 0-100]
     D --> F
     E --> F
-    F --> G[Score-Berechnung 0-100]
-    G --> H[Visualisierung / Karte]
+    F --> G[bikeability_scores.csv]
+    G --> H[GPX-Mapping und Karte]
 ```
 
 ---
 
-## 4. Edge-Deployment (NVIDIA Jetson Nano)
+## 4. Projektstruktur
 
-Das Scoring-Modell läuft als **Edge-AI-System** in Echtzeit auf einem NVIDIA Jetson Nano und
-zeigt den aktuellen Score während der Fahrt auf einem kleinen Display an.
-
-**Optimierungen für Echtzeit:**
-
-- Export des trainierten YOLO-Modells nach **TensorRT** (`.engine`) zur Nutzung der CUDA-Kerne.
-- Reduzierte Input-Auflösung (`imgsz=320` oder `416`).
-- Multi-Threading, damit die Display-Ausgabe den Inferenz-Thread nicht blockiert.
-
-**Display:** 3,5–5" HDMI-Touchscreen (Bild via HDMI, Strom/Touch via USB) – verhält sich wie
-ein Standardmonitor, Ausgabe via OpenCV im Vollbildmodus.
-
-**Stromversorgung:** Powerbank mit Power Delivery (PD); instabiler Strom führt bei GPU-Last zu
-Abstürzen.
-
-### Beispiel: Echtzeit-Overlay (vereinfacht)
-
-```python
-import cv2
-from ultralytics import YOLO
-
-model = YOLO("models/yolov8n.engine")   # TensorRT-optimiert
-cap = cv2.VideoCapture(0)
-score = 100.0
-
-while cap.isOpened():
-    success, frame = cap.read()
-    if not success:
-        break
-
-    results = model(frame, verbose=False)
-    car_count = sum(1 for box in results[0].boxes if int(box.cls) == 2)  # COCO class 2 = car
-
-    score = max(0, score - car_count * 5)  # Platzhalter-Heuristik
-
-    cv2.rectangle(frame, (10, 10), (300, 80), (0, 0, 0), -1)
-    cv2.putText(frame, f"BIKE SCORE: {int(score)}/100", (20, 45),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.putText(frame, f"Cars detected: {car_count}", (20, 70),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
-
-    cv2.imshow("Jetson Bike Display", frame)
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+```
+├── README.md
+├── final_bikeability_score/          # Finale End-to-End-Pipeline (Deliverable)
+│   ├── bikeability_score.ipynb       # Haupt-Notebook: Video -> Score -> Karte
+│   ├── detectors/                    # ground / environment / object + env_model.py
+│   ├── requirements.txt              # Abhängigkeiten der Pipeline
+│   ├── yolov8s.pt                    # YOLO-Gewichte
+│   ├── dataset/                      # input_videos/, input_gpx/
+│   └── output/                       # bikeability_scores.csv, score_with_gpx.csv, Karte
+├── research/                         # Experimente & Modellentwicklung
+│   ├── environment_model/            # SegFormer: Training & Evaluation
+│   ├── ground_detection/             # Oberflächen-/Straßenerkennung (CLIP-Benchmark)
+│   ├── Object_Detection/             # YOLO-Experimente
+│   ├── models/segformer_env/         # Trainiertes SegFormer-Modell (von final referenziert)
+│   ├── dataset/                      # Beispiel-/Evaluationsdaten
+│   └── requirements.txt              # Schlanke Abhängigkeiten für die Research-Skripte
+└── paper/                            # LaTeX-Quellen des Papers
 ```
 
 ---
 
 ## 5. Installation & Nutzung
 
-### Projektstruktur
-
-```
-├── README.md
-├── final_bikeability_score/     # Finale Pipeline (Deliverable)
-│   ├── bikeability_score.ipynb  # Haupt-Notebook (End-to-End Score)
-│   ├── detectors/               # Ground-/Environment-/Object-Detektoren (+ env_model.py)
-│   ├── requirements.txt         # Vollständige Abhängigkeiten der Pipeline
-│   ├── yolo26m.pt               # YOLO-Gewichte
-│   └── dataset/                 # Finaler Datensatz (raw/-Video + bikeability_scores.csv)
-├── research/                    # Experimente & Modellentwicklung
-│   ├── environment_model/       # SegFormer (Environment)
-│   ├── ground_detection/        # Oberflächen-/Straßenerkennung
-│   ├── Object_Detection/        # YOLO-Experimente
-│   ├── other/                   # Vorverarbeitung, GPX-Merge, etc.
-│   ├── models/segformer_env/    # Trainiertes SegFormer-Modell (von final referenziert)
-│   ├── dataset/                 # Beispiel-/Evaluationsdaten (eval, frames, test_images, gpx_data)
-│   └── requirements.txt         # Schlanke Abhängigkeiten für die Research-Skripte
-└── paper/                       # LaTeX-Quellen des Papers
-```
-
-### 5.1 Repository klonen
-
-```bash
-git clone https://github.com/<username>/computer_vision_bikeability_score.git
-cd computer_vision_bikeability_score
-```
-
-### 5.2 Virtuelle Umgebung (venv) anlegen
-
-Damit alle Entwickler:innen mit denselben Paket-Versionen arbeiten, wird pro Person eine
-**lokale** virtuelle Umgebung erstellt. Der `.venv/`-Ordner wird **nicht** ins Repository
-eingecheckt (siehe `.gitignore`) – committet wird nur die `requirements.txt` (in
-`final_bikeability_score/`, bzw. `research/` für die Research-Skripte).
-
-Empfohlene Python-Version: **3.10+**.
+Empfohlene Python-Version: **3.10+**. Der `.venv/`-Ordner wird **nicht** eingecheckt –
+committet wird nur die `requirements.txt`.
 
 **Windows (PowerShell):**
 
 ```powershell
-# venv erstellen
 python -m venv .venv
-
-# venv aktivieren
 .venv\Scripts\Activate.ps1
-
-# Abhängigkeiten installieren (finale Pipeline)
 pip install -r final_bikeability_score/requirements.txt
 ```
 
-> Falls die Aktivierung mit einem Ausführungsrichtlinien-Fehler abbricht, einmalig ausführen:
+> Bei einem Ausführungsrichtlinien-Fehler einmalig:
 > `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
 
 **macOS / Linux (bash/zsh):**
 
 ```bash
-# venv erstellen
 python3 -m venv .venv
-
-# venv aktivieren
 source .venv/bin/activate
-
-# Abhängigkeiten installieren (finale Pipeline)
 pip install -r final_bikeability_score/requirements.txt
 ```
 
 > Für die Research-Skripte genügt die schlanke `research/requirements.txt`.
 
-Zum Deaktivieren der Umgebung jederzeit `deactivate` ausführen.
+### Pipeline ausführen
 
-### 5.3 Notebook starten
+1. Videoteile nach `final_bikeability_score/dataset/input_videos/` legen (DJI teilt eine
+   Aufnahme in mehrere Dateien auf – alle Teile werden chronologisch als **ein**
+   durchgehendes Video verarbeitet).
+2. Optional den GPX-Track nach `dataset/input_gpx/` legen.
+3. Notebook starten und ausführen:
 
 ```bash
 jupyter lab final_bikeability_score/bikeability_score.ipynb
 ```
 
-> **Hinweis zur Reproduzierbarkeit:** Neue Pakete bitte mit fixierter Version in die
-> `requirements.txt` eintragen (z. B. `numpy==1.26.4`) und committen. Den `.venv/`-Ordner
-> niemals einchecken – er ist plattformabhängig und nicht portabel.
+Ergebnisse landen in `final_bikeability_score/output/`: `bikeability_scores.csv` (Score pro
+Frame), `score_with_gpx.csv` (mit GPS-Punkten gemergt) und `bikeability_map.png` (farbkodierte
+Karte, `RdYlGn`: 0 = rot, 100 = grün).
+
+> **Hinweis:** Die Kamera-Uhr der DJI ist unzuverlässig; die Startzeit wird über einen
+> manuellen Sync-Punkt (Standard: Aufnahme-Start = GPX-Start) bestimmt.
 
 ---
 
 ## 6. Evaluation
 
-Die Auswertung vergleicht zwei kontrastierende Streckenabschnitte aus dem Videomaterial
-(z. B. **Fahrt durch den Wald** vs. **Fahrt an einer Hauptstraße**):
-
-- Darstellung der extrahierten Features als Zeitreihe pro Segment.
-- Vergleich der aggregierten Bikeability-Scores.
-- Kartenbasierte, farbkodierte Darstellung des Score-Verlaufs (sofern GPS-Daten vorliegen).
-
-Für die Objektdetektion gelten Standardmetriken (mAP@50, mAP@50–95); für die
-Oberflächen-Klassifikation Accuracy, F1-Score und Confusion Matrix.
+- **Object Detection:** Standardmetriken (mAP@50, mAP@50–95).
+- **Ground Detection:** Zero-shot-CLIP-Varianten per macro-F1 verglichen
+  (`research/ground_detection/`); Gewinner: `ViT-B/32`, `laion2b_s34b_b79k`.
+- **Environment:** fine-tuned SegFormer-B0 schlägt Zero-shot-CLIP auf 1.210 eigenen
+  POV-Frames (macro-F1 0.704 vs. 0.649, Label-Accuracy 0.911 vs. 0.888).
+- **Score:** Vergleich kontrastierender Abschnitte (z. B. Waldweg vs. Hauptstraße) als
+  Feature-Zeitreihe und als farbkodierter Score-Verlauf auf der Karte.
 
 ---
 
-## 7. Aufbau des Papers (4 Seiten)
+## 7. Limitationen
 
-1. **Abstract** – Kurzfassung der Methodik zur automatisierten Bewertung von Radinfrastruktur
-   mittels Egocentric Vision.
-2. **Introduction & Related Work** – Relevanz aktiver Mobilität, bestehende Bikeability-Indizes.
-3. **Methodology** – Feature-Extraktion (YOLO, HSV), mathematische Definition des
-   Scoring-Modells, Begründung der Gewichtung $w$.
-4. **Evaluation & Results** – Vergleich zweier Streckenabschnitte, Feature-Zeitreihen.
-5. **Conclusion** – Limitationen (z. B. Wetter-/Helligkeitsabhängigkeit der Grünerkennung),
-   Ausblick. Stichworte: *Edge AI, TensorRT-Latenzoptimierung, HMI für Radfahrer*.
+- Umgebungs- und Oberflächenerkennung sind abhängig von Wetter, Tageszeit und Belichtung.
+- Die Gewichte und Bewertungstabellen sind heuristisch, nicht datengetrieben validiert.
+- Die zeitliche Zuordnung Score ↔ GPS beruht auf einem manuellen Sync-Punkt.
 
 ---
 
-## 8. Limitationen
+## 8. Tech-Stack
 
-- Grün- und Himmelserkennung ist abhängig von Wetter, Tageszeit und Belichtung.
-- HSV-Schwellwerte sind szenenabhängig und müssen ggf. kalibriert werden.
-- Distanzschätzung aus Monokular-Video ist nur ein Proxy (relative Bounding-Box-Größe).
-- Die Gewichte $w$ sind heuristisch und nicht datengetrieben validiert.
-
----
-
-## 9. Tech-Stack
-
-- **Computer Vision:** Ultralytics YOLOv8/YOLOv10, OpenCV
-- **Deep Learning:** PyTorch, ResNet/EfficientNet (Oberflächen-Klassifikation)
-- **Edge AI:** NVIDIA Jetson Nano, TensorRT
+- **Computer Vision:** Ultralytics YOLO, OpenCLIP, OpenCV
+- **Deep Learning:** PyTorch, Hugging Face Transformers (SegFormer)
 - **Analyse:** Python, NumPy, pandas, Matplotlib, Jupyter
 
 ---
 
-## 10. Ressourcen
+## 9. Ressourcen
 
 - 📊 Miro-Mindmap: [Projekt-Board](https://miro.com/welcomeonboard/M0ozRVhXNE50ZEE2cXJpVy9mZzk1S1ZHeVFEcDNETTY0UllyMlIvenh5NEZtTVdSMGpHT0lqQnRTRlE0NjJnRm02MUltZjdtNGxLYTl1QUpvOVU5TlJXdFFJSThCak1FR00yVXRPaVhEcEd1aW03NjNqYit3OGpqRGxjbzl4eUhBS2NFMDFkcUNFSnM0d3FEN050ekl3PT0hdjE=?share_link_id=549246225146)
 - 📦 Datensatz: [Google Drive](https://drive.google.com/drive/folders/1cMV4_znMxJ1V4L5ZnJUUq9dNIdBuOYaO?usp=sharing)
 
 ---
 
-*Dieses Projekt entstand im Rahmen des Mastermoduls „Bildverarbeitung und Bildverstehen“.*
+*Dieses Projekt entstand im Rahmen des Mastermoduls „Bildverarbeitung und Bildverstehen".*
