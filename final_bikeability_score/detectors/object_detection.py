@@ -6,7 +6,7 @@ ultralytics). Only the classes relevant to the score are counted:
 
 Usage (instantiate once, then reuse per frame):
     from detectors.object_detection import ObjectDetector
-    objects = ObjectDetector()                # loads yolo26m.pt once
+    objects = ObjectDetector()                # loads yolov8s.pt once
     counts = objects.detect(frame_bgr)        # np.int [3], order = ObjectDetector.classes
 
 Return value: counts np.ndarray over ["bicycle", "car", "traffic light"].
@@ -19,8 +19,8 @@ import torch
 from ultralytics import YOLO
 
 TARGET_CATEGORIES = ("bicycle", "car", "traffic light")
-MODEL_WEIGHTS = "yolo26m.pt"
-CONF_THRESHOLD = 0.15
+MODEL_WEIGHTS = "yolo11s.pt"
+CONF_THRESHOLD = 0.2
 
 
 class ObjectDetector:
