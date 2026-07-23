@@ -397,51 +397,45 @@ File: images/fig_confusion_best.pdf Graphic file (type pdf)
 
 
 ]
-Underfull \hbox (badness 1924) in paragraph at lines 221--227
-[]\T1/ptm/m/n/10 Table II[] lists the track. Two levers dom-i-nated: \T1/ptm/m/
-it/10 per-
- []
+
+LaTeX Font Warning: Font shape `T1/ptm/m/scit' undefined
+(Font)              using `T1/ptm/m/it' instead on input line 268.
 
 
 LaTeX Font Warning: Font shape `T1/ptm/m/scit' undefined
-(Font)              using `T1/ptm/m/it' instead on input line 264.
+(Font)              using `T1/ptm/m/it' instead on input line 268.
 
 
-LaTeX Font Warning: Font shape `T1/ptm/m/scit' undefined
-(Font)              using `T1/ptm/m/it' instead on input line 264.
-
-
-LaTeX Font Warning: Font shape `T1/ptm/m/scit' undefined
-(Font)              using `T1/ptm/m/it' instead on input line 264.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 276--276
+Underfull \hbox (badness 10000) in paragraph at lines 281--281
 []|\T1/ptm/m/n/7 S3--
  []
 
 
-Underfull \hbox (badness 2229) in paragraph at lines 288--294
-\T1/ptm/b/n/10 F1\T1/ptm/m/n/10 , \T1/ptm/b/n/10 label-accuracy \T1/ptm/m/n/10 
-(mean per-(frame,class) cor-rect-ness),
+Underfull \hbox (badness 2326) in paragraph at lines 296--302
+\T1/ptm/m/n/10 own-test set (ride-disjoint from all tun-ing; $\OT1/cmr/m/n/10 9
+83\OML/cmm/m/it/10 =\OT1/cmr/m/n/10 40\OML/cmm/m/it/10 =\OT1/cmr/m/n/10 307$
  []
 
-File: images/fig_env_comparison.pdf Graphic file (type pdf)
-<use images/fig_env_comparison.pdf>
 [4
 
 ]
-Underfull \hbox (badness 3375) in paragraph at lines 375--378
+File: images/fig_isof1_scatter.png Graphic file (type bmp)
+<images/fig_isof1_scatter.png>
+ [5
+
+]
+Underfull \hbox (badness 3375) in paragraph at lines 393--396
 \T1/ptm/m/n/10 hot vec-tor $\OT1/cmr/bx/n/10 g$ \T1/ptm/m/n/10 with the sur-fac
 e qual-ity vec-tor $\OT1/cmr/bx/n/10 q[] \OT1/cmr/m/n/10 =
  []
 
 File: images/bikeability_map.png Graphic file (type bmp)
 <images/bikeability_map.png>
-[5
+[6
 
-] (bikeability_paper.bbl) [6] (bikeability_paper.aux)
+] (bikeability_paper.bbl) [7] (bikeability_paper.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  )
-Output written on bikeability_paper.xdv (6 pages, 31292 bytes).
+Output written on bikeability_paper.xdv (7 pages, 32164 bytes).
