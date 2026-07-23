@@ -1,10 +1,8 @@
-# --- Virtuelle Umgebungen (nicht einchecken, plattformabhängig) ---
 .venv/
 venv/
 env/
 ENV/
 
-# --- Python-Artefakte ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -13,10 +11,8 @@ __pycache__/
 build/
 dist/
 
-# --- Jupyter ---
 .ipynb_checkpoints/
 
-# --- Modelle / Gewichte / Videos (große Dateien) ---
 *.engine
 *.pt
 *.onnx
@@ -25,34 +21,27 @@ dist/
 *.mov
 *.MOV
 
-# --- IDE / OS ---
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
 
-# --- Frames: nur beispiel_dji_0390 einchecken, alle anderen ignorieren ---
-dataset/frames/*
-!dataset/frames/beispiel_dji_0390/
-!dataset/frames/beispiel_dji_0390/**
-dataset/frames/beispiel_dji_0390/zeroshot/
+research/dataset/frames/*
+!research/dataset/frames/beispiel_dji_0390/
+!research/dataset/frames/beispiel_dji_0390/**
+research/dataset/frames/beispiel_dji_0390/zeroshot/
 
-# --- Test-Set Bilder (generiert von environment_model/data/build_test_dataset.py) ---
-dataset/test_images/*
-!dataset/test_images/candidates.csv
-!dataset/test_images/labels.csv
+research/dataset/test_images/*
+!research/dataset/test_images/candidates.csv
+!research/dataset/test_images/labels.csv
 
-# --- Externe Datensaetze (grosse Downloads: Mapillary ~25 GB, ADE20K ~1 GB) ---
-dataset/external/
+research/dataset/external/
 
-# --- Finetune-Experimente (temporäre Trainer-Ausgaben) ---
-models/_tmp_experiments/
+research/models/_tmp_experiments/
 
 
-# --- Trainingsbilder-Ordner (Symlinks/Kopien, generiert von organize_training_images.py) ---
-dataset/training/*
-!dataset/training/manifest.csv
+research/dataset/training/*
+!research/dataset/training/manifest.csv
 
-# --- Ground-Detection Daten (von main) ---
-dataset/testdataset
+research/dataset/testdataset
 research/ground_detection/dataset

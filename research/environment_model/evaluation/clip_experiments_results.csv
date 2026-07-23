@@ -1,0 +1,5 @@
+backbone,prompts,val_macroF1_4c,test_macroF1_3c,test_labelAcc,test_F1_forest,test_F1_open_field,test_F1_city,val_F1_water,thr
+vit-b32,single,0.699,0.733,0.729,0.673,0.69,0.837,0.558,"{'forest': 0.09, 'open_field': 0.05, 'water': 0.86, 'city': 0.16}"
+vit-b32,ensemble,0.73,0.771,0.805,0.744,0.737,0.833,0.615,"{'forest': 0.07, 'open_field': 0.24, 'water': 0.39, 'city': 0.82}"
+vit-l14,single,0.622,0.682,0.703,0.689,0.551,0.805,0.441,"{'forest': 0.21, 'open_field': 0.08, 'water': 0.95, 'city': 0.02}"
+vit-l14,ensemble,0.714,0.756,0.811,0.714,0.782,0.774,0.593,"{'forest': 0.08, 'open_field': 0.44, 'water': 0.69, 'city': 0.89}"
