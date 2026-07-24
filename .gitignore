@@ -45,3 +45,5 @@ research/dataset/training/*
 
 research/dataset/testdataset
 research/ground_detection/dataset
+
+dataset/
