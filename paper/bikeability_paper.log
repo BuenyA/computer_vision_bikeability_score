@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.9)  24 JUL 2026 14:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.9)  24 JUL 2026 23:07
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -429,84 +429,82 @@ Package pdftex.def Info: images/fig_confusion_best.pdf  used on input line 237.
  [2
 
  <./images/fig_confusion_best.pdf>]
+
+LaTeX Warning: Citation `cit1' on page 3 undefined on input line 327.
+
 <images/yolo_speed_accu.png, id=90, 497.9403pt x 354.123pt>
 File: images/yolo_speed_accu.png Graphic file (type png)
 <use images/yolo_speed_accu.png>
-Package pdftex.def Info: images/yolo_speed_accu.png  used on input line 290.
+Package pdftex.def Info: images/yolo_speed_accu.png  used on input line 352.
 (pdftex.def)             Requested size: 120.95892pt x 86.0179pt.
-LaTeX Font Info:    Trying to load font information for T1+phv on input line 290.
- (/usr/local/texlive/2026/texmf-dist/tex/latex/psnfss/t1phv.fd
+LaTeX Font Info:    Trying to load font information for T1+phv on input line 352.
+(/usr/local/texlive/2026/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2020/03/25 scalable font definitions for T1/phv.
 )
 <images/yolo_bench_threshold.png, id=92, 498.663pt x 354.123pt>
 File: images/yolo_bench_threshold.png Graphic file (type png)
 <use images/yolo_bench_threshold.png>
-Package pdftex.def Info: images/yolo_bench_threshold.png  used on input line 294.
+Package pdftex.def Info: images/yolo_bench_threshold.png  used on input line 356.
 (pdftex.def)             Requested size: 120.95892pt x 85.89903pt.
+ [3
 
-Underfull \hbox (badness 10000) in paragraph at lines 352--353
-\T1/ptm/m/n/9 bike, city bike,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 352--353
-\T1/ptm/m/n/9 BMX, bi-cy-cle
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 353--354
-[]|\T1/ptm/m/n/9 Motorcycle, mo-tor
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 354--355
-[]|\T1/ptm/m/n/9 Sedan, hatch-back,
- []
-
-[3
-
- <./images/yolo_speed_accu.png> <./images/yolo_bench_threshold.png>] [4
+ <./images/yolo_speed_accu.png> <./images/yolo_bench_threshold.png>]
+<images/detection_heatmap.png, id=100, 650.43pt x 361.35pt>
+File: images/detection_heatmap.png Graphic file (type png)
+<use images/detection_heatmap.png>
+Package pdftex.def Info: images/detection_heatmap.png  used on input line 427.
+(pdftex.def)             Requested size: 120.95892pt x 67.19606pt.
+<images/box_height.png, id=101, 578.16pt x 325.215pt>
+File: images/box_height.png Graphic file (type png)
+<use images/box_height.png>
+Package pdftex.def Info: images/box_height.png  used on input line 431.
+(pdftex.def)             Requested size: 120.95892pt x 68.03911pt.
+ [4 <./images/detection_heatmap.png> <./images/box_height.png>] [5
 
 
 ]
-Underfull \hbox (badness 3375) in paragraph at lines 428--431
+Underfull \hbox (badness 3375) in paragraph at lines 532--535
 \T1/ptm/m/n/10 hot vec-tor $\OT1/cmr/bx/n/10 g$ \T1/ptm/m/n/10 with the sur-face qual-ity vec-tor $\OT1/cmr/bx/n/10 q[] \OT1/cmr/m/n/10 =
  []
 
-[5
+[6
 
 ]
-<images/bikeability_map.png, id=116, 740.0448pt x 570.4512pt>
+<images/bikeability_map.png, id=123, 740.0448pt x 570.4512pt>
 File: images/bikeability_map.png Graphic file (type png)
 <use images/bikeability_map.png>
-Package pdftex.def Info: images/bikeability_map.png  used on input line 525.
+Package pdftex.def Info: images/bikeability_map.png  used on input line 629.
 (pdftex.def)             Requested size: 252.0pt x 194.24678pt.
  (./bikeability_paper.bbl
 Underfull \hbox (badness 1681) in paragraph at lines 27--28
 []\T1/ptm/m/n/8 G. Il-harco, M. Worts-man, R. Wight-man, C. Gor-don, N. Car-lini,
  []
 
-) [6
+) [7
 
  <./images/bikeability_map.png>] (./bikeability_paper.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
+
+
+LaTeX Warning: There were undefined references.
+
  ) 
 Here is how much of TeX's memory you used:
- 7280 strings out of 467525
- 123159 string characters out of 5418983
- 563143 words of memory out of 5000000
- 36051 multiletter control sequences out of 15000+600000
+ 7298 strings out of 467525
+ 123676 string characters out of 5418983
+ 563216 words of memory out of 5000000
+ 36069 multiletter control sequences out of 15000+600000
  753003 words of font info for 180 fonts, out of 8000000 for 9000
  1145 hyphenation exceptions out of 8191
  57i,16n,65p,472b,510s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on bikeability_paper.pdf (6 pages, 462682 bytes).
+Output written on bikeability_paper.pdf (7 pages, 516577 bytes).
 PDF statistics:
- 212 PDF objects out of 1000 (max. 8388607)
- 93 compressed objects within 1 object stream
+ 221 PDF objects out of 1000 (max. 8388607)
+ 97 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 

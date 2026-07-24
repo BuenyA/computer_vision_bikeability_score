@@ -248,57 +248,33 @@ Cycleway/Road pair and the rare Gravel/Unpaved classes.}
 
 \clearpage
 \section{Object Detection}
-% --- NOTE: This section will be written later. ---
 
-\subsection{Technical Scope}
-For the object recognition module, the methodology focuses specifically
-on counting objects.
+For this evaluator, the methodology focuses specifically on counting objects.
 This design choice was made because objects move relative to the bike
-rider regardless of their absolute speed, as the rider is in continuous
-motion.
-Consequently, an object's size within the field of view changes frame
-by frame and cannot serve as a stable factor for calculations.
+rider, as the rider is in continuous motion, so an object's size within 
+the field of view changes on each frame and is not a stable factor for calculations.
 
-This dynamic property led to another design consideration regarding the
-scope of the \enquote{bikeability score} evaluator: evaluating the
-exact same route will yield slightly different results depending on
-the specific time the footage is captured.
-For this algorithm to be viable in a mass-market product, it must be
-capable of running in real time on an edge device mounted on the
-bicycle.
-This strict real-time requirement applies to the dynamic object
-detection, but not to the other two static sub-scores.
+This led to another design consideration regarding the scope of the 
+\enquote{bikeability score} evaluator: the same route will yield 
+different results depending on the moment the footage is captured.
+For this algorithm to be usable product, it must be capable of running 
+in real time on a device mounted on the bicycle.
+This requirement applies only to the object detection.
 
-\subsection{Performance Trade-offs}
-Therefore, the primary selection parameters for this specific task are
-the model's inference time and its overall size, which are inherently
-related.
-Because larger models can extract more complex image features, there
-is a direct trade-off between inference time and accuracy, requiring
-us to find an optimal balance for our model selection.
+Therefore, aditional selection criteria for this specific task are
+the model's inference time and its overall size, which are
+related. Larger models can also extract more complex image features, 
+creating a trade-off between inference time and accuracy, requiring to
+find an optimal balance for our model.
 
-These runtime criteria, combined with the fact that this module only
-requires object recognition, led directly to targeting the YOLO family
-of models as the most suitable candidates for the task.
-However, it remains necessary to benchmark different generations and
-sizes of YOLO models to determine the most effective configuration.
+The fact that this module only requires object recognition with high 
+efficiency, led directly to the YOLO family of models as best candidates 
+for the task.
+However, it remained necessary to benchmark different generations and
+sizes of these models to determine the best option for our application
+case.
 
-\begin{figure}[!h]
-\centering
-\subfloat[]{%
-\includegraphics[width=0.48\columnwidth]{images/yolo_speed_accu.png}%
-\label{fig:yolo_speed_accuracy}}
-\hfill
-\subfloat[]{%
-\includegraphics[width=0.48\columnwidth]{images/yolo_bench_threshold.png}%
-\label{fig:yolo_confidence}}
-\caption{YOLO model comparison for the object-detection module.
-(a) Inference speed vs.\ macro MAE across YOLO variants.
-(b) Macro MAE vs.\ confidence threshold per model.}
-\label{fig:yolo_comparison}
-\end{figure}
-
-\subsection{Object Classes}
+\subsection{Relevant Objects}
 For the calculation of the score, the methodology restricts the
 categories of relevant objects.
 Rather than defining new categories from scratch, the project utilizes
@@ -306,46 +282,24 @@ widely accepted object set categorizations.
 Because the system employs a pre-trained YOLO model, it is more
 efficient to leverage its baseline capabilities before resorting to
 custom retraining.
-Consequently, the COCO \cite{coco} dataset convention was selected as the primary
-starting point, though Mapillary Vistas \cite{mapillaryvistas} remains a viable alternative dataset
-for future iterations.
+Consequently, the COCO \cite{coco} dataset convention was selected as
+the reference.
 
-The COCO dataset classifies detected objects into 80 distinct
-categories, not all of which are relevant to traffic environments.
-Therefore, the relevant classes were grouped into three primary
-subsets (Table~\ref{tab:coco_subsets}).
-
-\begin{table}[H]
-\caption{Grouping of relevant COCO object classes into traffic-related
-categories.}
-\label{tab:coco_subsets}
-\centering
-\small
-\begin{tabular}{@{}lp{4.8cm}@{}}
-\toprule
-\textbf{Category} & \textbf{COCO Object Classes}\\
-\midrule
-Motor vehicles & car, truck, bus, motorcycle\\
-Other road users & person, bicycle\\
-Traffic infrastructure & traffic light, stop sign, parking meter,
-  fire hydrant, bench\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-From these subsets, three representative classes were selected:
-\textbf{car}, \textbf{bicycle}, and \textbf{traffic light}.
-
-To ensure accurate labeling within the reference dataset, it is
-necessary to strictly define the boundaries and potential edge cases
-for the target classes (Table~\ref{tab:object_classes}).
+This dataset consists of 80 object categories, not all of which are
+relevant to street traffic.
+The relevant classes were grouped into three primary subsets from
+which representative classes were selected: \textbf{car},
+\textbf{bicycle}, and \textbf{traffic light}.
+To ensure accurate labeling of the reference dataset, boundaries and
+potential edge cases are also defined
+(Table~\ref{tab:object_classes}).
 
 \begin{table}[H]
 \caption{Class boundary definitions for the object detector.}
 \label{tab:object_classes}
 \centering
 \small
-\begin{tabular}{@{}p{1.5cm}p{2.7cm}p{2.7cm}@{}}
+\begin{tabular}{@{}p{1.5cm}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.7cm}@{}}
 \toprule
 \textbf{Class} & \textbf{IS} & \textbf{IS NOT}\\
 \midrule
@@ -356,6 +310,156 @@ Car & Sedan, hatchback, wagon, coupe, SUV, crossover, minivan
 \bottomrule
 \end{tabular}
 \end{table}
+
+The scoring heuristic designates cars as the primary negative factor
+due to their physical size and potential speed.
+In contrast, the presence of other bicycles acts as a mitigating
+buffer, offsetting penalties incurred by cars or traffic lights.
+Because the overall score is bounded, bicycles cannot independently
+increase the score beyond the baseline; they can only reduce existing
+penalties.
+Consequently, an empty road yields the maximum possible score.
+
+\subsection{YOLO Benchmark}
+Initial benchmarking helps isolate the strongest candidate models.
+Trial runs were conducted on NVIDIA T4 GPUs via Google Colab, which
+represent a standard hardware platform for model benchmarking
+\cite{cit1}.
+The T4 operates within the NVIDIA ecosystem---utilizing the CUDA API,
+cuDNN libraries, and dedicated execution engines---which closely
+mirrors the software architecture of edge devices like the NVIDIA
+Jetson series.
+
+The YOLO26 family, released in January 2026, directly succeeds the
+YOLO11 lineup in the Ultralytics lineage.
+YOLO26 introduces an architecture that eliminates the need for
+Non-Maximum Suppression (NMS), reducing latency and making it a
+promising candidate for real-time processing, though it remains less
+battle-tested than its predecessors.
+
+Comparing models at equivalent scales (nano and small) reveals that
+model size---rather than architectural generation---is the primary
+driver of performance and computational cost.
+At the small scale, YOLO11s achieves a lower macro Mean Absolute Error
+(MAE) than YOLO26s alongside comparable or faster inference,
+maintaining this performance margin across all confidence thresholds
+(Fig.~\ref{fig:yolo_comparison}\subref{fig:yolo_speed_accuracy}).
+
+\begin{figure}[!t]
+\centering
+\subfloat[]{%
+\includegraphics[width=0.48\columnwidth]{images/yolo_speed_accu.png}%
+\label{fig:yolo_speed_accuracy}}
+\hfill
+\subfloat[]{%
+\includegraphics[width=0.48\columnwidth]{images/yolo_bench_threshold.png}%
+\label{fig:yolo_confidence}}
+\caption{YOLO model comparison for the object-detection module.
+(a) Mean inference time vs.\ macro MAE across YOLO variants.
+(b) Macro MAE vs.\ confidence threshold per model.}
+\label{fig:yolo_comparison}
+\end{figure}
+
+Larger variants like YOLO26x offer higher overall accuracy, but double
+the inference time and exceed target edge hardware limits.
+Model scaling carries a steep cost: stepping from nano to medium
+increases parameters by more than eightfold ($\sim$3.2\,M to
+$\sim$25.9\,M) and compute nearly tenfold (8.7 to 78.9\,GFLOPs).
+By contrast, switching architectures from YOLO11s to YOLO26s adds a
+negligible $\sim$1\,\% increase in parameters (9.4\,M to 9.5\,M) for
+only modest gains.
+
+Because YOLO26 only outperforms YOLO11 when scaling up model size,
+YOLO11s remains the stronger candidate for edge deployment given its
+maturity, speed, and computational efficiency.
+Notably, these findings reflect behavior on our labeled data;
+performance on other datasets may vary.
+
+\subsection{Effect of Confidence Thresholds on Model Performance}
+Confidence thresholding plays a critical role in balancing false
+positives and false negatives within object predictions.
+Across all evaluated models, the MAE drops sharply as the threshold is
+raised from very low values (0.05--0.15).
+In this lower range, a large volume of incorrect detections exhibits
+low confidence scores, whereas true positive detections yield
+significantly higher confidence.
+Raising the threshold systematically eliminates a disproportionate
+number of false positives while retaining the majority of true
+positives, up to a point beyond which further increases primarily
+filter out valid detections.
+
+The tested models reach their minimum MAE at different confidence
+thresholds (Fig.~\ref{fig:yolo_comparison}\subref{fig:yolo_confidence}).
+This variation indicates differences in calibration across model
+architectures, confirming that both model selection and threshold
+configuration must be tuned specifically for the target application.
+For our dataset, YOLO11s achieves its optimal performance at a
+confidence threshold of approximately 0.20.
+
+\subsection{Dataset Distribution and Bounding Box Analysis}
+Having defined the conventions for target object categories, we next
+analyze how these objects are distributed across the dataset to
+evaluate the suitability of the chosen model architecture.
+
+Given the manual effort required to annotate object bounding boxes
+across the full dataset, this structural analysis was assisted by
+YOLO26x---the model that demonstrated the highest detection accuracy
+during preliminary evaluation, despite exceeding the computational
+constraints for edge deployment.
+An inference pass using YOLO26x provided precise bounding box
+coordinates and dimensions across all frames, yielding insights into
+spatial distribution and scale.
+While cars represent the most frequent object class, bicycles are
+significantly sparser and prove more challenging to detect.
+
+Spatial localization of detections clusters tightly around the
+horizontal center of the image (roughly $x = 0.40$ to $0.65$) at
+mid-to-lower frame height ($y \approx 0.45$ to $0.65$), exhibiting two
+distinct density hotspots rather than a uniform distribution
+(Fig.~\ref{fig:bike_distribution}\subref{fig:bike_heatmap}).
+As expected given the camera perspective, detections concentrate along
+the road surface, with density increasing near the vanishing point.
+
+\begin{figure}[!t]
+\centering
+\subfloat[]{%
+\includegraphics[width=0.48\columnwidth]{images/detection_heatmap.png}%
+\label{fig:bike_heatmap}}
+\hfill
+\subfloat[]{%
+\includegraphics[width=0.48\columnwidth]{images/box_height.png}%
+\label{fig:bike_boxheight}}
+\caption{Distribution of bicycle detections across the dataset.
+(a) Spatial density of detections in normalised image coordinates.
+(b) Histogram of detected bounding box heights in pixels.}
+\label{fig:bike_distribution}
+\end{figure}
+
+Object size directly correlates with distance from the camera.
+This effect is particularly pronounced in the bicycle class, which
+represents the most difficult category to detect due to its relative
+scarcity.
+Across 1001 evaluated frames, 565 raw bicycle detections were recorded,
+with a median bounding box height of only 93\,px (10th percentile
+$=$ 46\,px, 90th percentile $=$ 228\,px).
+This indicates that most bicycle detections occur while the vehicle is
+distant---located near the central vanishing point---with very few
+detections occurring at close range off to the side.
+
+An initial hypothesis formulated during development suggested that the
+MAE for bicycles primarily stems from undercounting small, distant
+objects.
+At its baseline setting (confidence threshold $=$ 0.25, minimum box
+height $=$ 0--30\,px), the model predicted 154 bicycle instances,
+achieving an MAE of 0.127 and a bias of $-0.10$.
+Applying a minimum height filter of 70\,px (effectively discarding
+small, distant detections near the center) degraded performance: the
+predicted count dropped to 125, and the MAE increased to 0.15.
+
+These empirical results directly support the hypothesis: small,
+centered detections along the bike's path represent critical instances
+that size-filtering or excessive downscaling would erroneously
+eliminate.
 
 % =====================================================================
 % PAGE 4 -- ENVIRONMENT DETECTION (not Bünyamin -- heading only)
