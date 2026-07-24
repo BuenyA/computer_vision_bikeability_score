@@ -281,50 +281,27 @@ Rather than defining new categories from scratch, the project utilizes
 widely accepted object set categorizations.
 Because the system employs a pre-trained YOLO model, it is more
 efficient to leverage its baseline capabilities before resorting to
-custom retraining.
-Consequently, the COCO \cite{coco} dataset convention was selected as
-the reference.
-
-This dataset consists of 80 object categories, not all of which are
+custom retraining. Consequently, the COCO \cite{coco} dataset convention was selected as
+the reference, which consists of 80 object categories, not all of which 
 relevant to street traffic.
-The relevant classes were grouped into three primary subsets from
+The relevant classes were grouped into three subsets: \textbf{motor vehicles},
+\textbf{other road users}, and \textbf{traffic infrastructure}, from
 which representative classes were selected: \textbf{car},
 \textbf{bicycle}, and \textbf{traffic light}.
-To ensure accurate labeling of the reference dataset, boundaries and
-potential edge cases are also defined
-(Table~\ref{tab:object_classes}).
 
-\begin{table}[H]
-\caption{Class boundary definitions for the object detector.}
-\label{tab:object_classes}
-\centering
-\small
-\begin{tabular}{@{}p{1.5cm}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.7cm}@{}}
-\toprule
-\textbf{Class} & \textbf{IS} & \textbf{IS NOT}\\
-\midrule
-Bicycle & Road bike, mountain bike, city bike, BMX, bicycle w/rider
-  & Motorcycle, motor scooter\\
-Car & Sedan, hatchback, wagon, coupe, SUV, crossover, minivan
-  & Bus, truck, train\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The scoring heuristic designates cars as the primary negative factor
+The scoring heuristic designates cars as primary negative factor
 due to their physical size and potential speed.
-In contrast, the presence of other bicycles acts as a mitigating
+In contrast, the presence of bicycles acts as a mitigating
 buffer, offsetting penalties incurred by cars or traffic lights.
 Because the overall score is bounded, bicycles cannot independently
 increase the score beyond the baseline; they can only reduce existing
-penalties.
-Consequently, an empty road yields the maximum possible score.
+penalties. Consequently, an empty road yields the maximum possible score.
 
 \subsection{YOLO Benchmark}
 Initial benchmarking helps isolate the strongest candidate models.
 Trial runs were conducted on NVIDIA T4 GPUs via Google Colab, which
 represent a standard hardware platform for model benchmarking
-\cite{cit1}.
+\cite{yolo26}.
 The T4 operates within the NVIDIA ecosystem---utilizing the CUDA API,
 cuDNN libraries, and dedicated execution engines---which closely
 mirrors the software architecture of edge devices like the NVIDIA
@@ -340,9 +317,9 @@ battle-tested than its predecessors.
 Comparing models at equivalent scales (nano and small) reveals that
 model size---rather than architectural generation---is the primary
 driver of performance and computational cost.
-At the small scale, YOLO11s achieves a lower macro Mean Absolute Error
+At the small scale of the benchmark, YOLO11s achieves a lower macro Mean Absolute Error
 (MAE) than YOLO26s alongside comparable or faster inference,
-maintaining this performance margin across all confidence thresholds
+maintaining this performance margin across most confidence thresholds
 (Fig.~\ref{fig:yolo_comparison}\subref{fig:yolo_speed_accuracy}).
 
 \begin{figure}[!t]
@@ -365,12 +342,13 @@ the inference time and exceed target edge hardware limits.
 Model scaling carries a steep cost: stepping from nano to medium
 increases parameters by more than eightfold ($\sim$3.2\,M to
 $\sim$25.9\,M) and compute nearly tenfold (8.7 to 78.9\,GFLOPs).
-By contrast, switching architectures from YOLO11s to YOLO26s adds a
-negligible $\sim$1\,\% increase in parameters (9.4\,M to 9.5\,M) for
-only modest gains.
+Switching architectures from YOLO11s to YOLO26s adds a
+negligible $\sim$1\,\% increase in parameters (9.4\,M to 9.5\,M) with
+only modest gains. This kind of analysis is habitual in edge deployment 
+scenarios. \cite{yolo_embedded}
 
-Because YOLO26 only outperforms YOLO11 when scaling up model size,
-YOLO11s remains the stronger candidate for edge deployment given its
+Because YOLO26 only outperforms YOLO11 when scaling up size,
+YOLO11s remains the stronger candidate here given its
 maturity, speed, and computational efficiency.
 Notably, these findings reflect behavior on our labeled data;
 performance on other datasets may vary.
@@ -379,14 +357,10 @@ performance on other datasets may vary.
 Confidence thresholding plays a critical role in balancing false
 positives and false negatives within object predictions.
 Across all evaluated models, the MAE drops sharply as the threshold is
-raised from very low values (0.05--0.15).
-In this lower range, a large volume of incorrect detections exhibits
-low confidence scores, whereas true positive detections yield
-significantly higher confidence.
-Raising the threshold systematically eliminates a disproportionate
-number of false positives while retaining the majority of true
-positives, up to a point beyond which further increases primarily
-filter out valid detections.
+raised from very low values (0.05--0.15). In this range, a large volume 
+of incorrect detections exhibits low confidence scores.
+Raising the threshold eliminates the false positives while retaining 
+most true positives, up to a point beyond from which it filters out valid detections.
 
 The tested models reach their minimum MAE at different confidence
 thresholds (Fig.~\ref{fig:yolo_comparison}\subref{fig:yolo_confidence}).
@@ -397,19 +371,15 @@ For our dataset, YOLO11s achieves its optimal performance at a
 confidence threshold of approximately 0.20.
 
 \subsection{Dataset Distribution and Bounding Box Analysis}
-Having defined the conventions for target object categories, we next
-analyze how these objects are distributed across the dataset to
-evaluate the suitability of the chosen model architecture.
+An analysis of how the detected objects are distributed across the dataset to
+was carried out to better understand the data and evaluate the suitability of the chosen model.
 
 Given the manual effort required to annotate object bounding boxes
-across the full dataset, this structural analysis was assisted by
-YOLO26x---the model that demonstrated the highest detection accuracy
-during preliminary evaluation, despite exceeding the computational
-constraints for edge deployment.
-An inference pass using YOLO26x provided precise bounding box
-coordinates and dimensions across all frames, yielding insights into
-spatial distribution and scale.
-While cars represent the most frequent object class, bicycles are
+across the full dataset, this analysis was assisted by YOLO26x
+---the model that demonstrated the highest detection accuracy
+during preliminary evaluation, while exceeding the imposed computational
+constraints. An inference pass using YOLO26x provided bounding boxes across all frames.
+It was shown that cars represent the most frequent object class, while bicycles are
 significantly sparser and prove more challenging to detect.
 
 Spatial localization of detections clusters tightly around the
@@ -435,10 +405,10 @@ the road surface, with density increasing near the vanishing point.
 \label{fig:bike_distribution}
 \end{figure}
 
-Object size directly correlates with distance from the camera.
-This effect is particularly pronounced in the bicycle class, which
-represents the most difficult category to detect due to its relative
-scarcity.
+Object size correlates with distance from the camera. Farther objects 
+appear smaller, potentially making them harder to detect. Bicycles represent
+the most difficult category to detect due to its relative
+scarcity, making the size distribution of detected bicycles particularly relevant.
 Across 1001 evaluated frames, 565 raw bicycle detections were recorded,
 with a median bounding box height of only 93\,px (10th percentile
 $=$ 46\,px, 90th percentile $=$ 228\,px).
@@ -457,7 +427,7 @@ small, distant detections near the center) degraded performance: the
 predicted count dropped to 125, and the MAE increased to 0.15.
 
 These empirical results directly support the hypothesis: small,
-centered detections along the bike's path represent critical instances
+centered detections along the user's path represent critical instances
 that size-filtering or excessive downscaling would erroneously
 eliminate.
 
