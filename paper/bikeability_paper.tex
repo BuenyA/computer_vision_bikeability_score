@@ -53,6 +53,52 @@ CLIP, surface classification, object detection, GPX.
 \section{Introduction}
 % --- NOTE: This section will be written later. ---
 
+Computer vision is one of the technologies that has firmly established
+itself in recent decades.
+The increase in computing capacity, the abundance of data, and the
+improvement of algorithms have propelled it---just as they have other
+areas of artificial intelligence---to the point where the technology is
+becoming a standard tool.
+We now view it as the de-facto solution to problems that previously
+required entirely different methods.
+
+Take ADAS, for example, which are now expected in passenger vehicles
+rather than viewed as luxury equipment.
+However, these systems have largely not made their way to smaller
+vehicles like motorcycles or bicycles, the latter of which provide
+transportation and recreation to millions of people.
+Regular bicycle commuting inspired this project to implement vision
+systems not only to assess the safety, but also the aesthetic---and
+therefore mood-improving---aspects of bicycle routes.
+We call this metric the \enquote{bikeability score}, based on the
+premise that while all roads are technically drivable, they do not all
+provide the same riding experience.
+
+The score singles out three distinct factors that define this
+experience:
+\begin{itemize}
+  \item \textbf{The road itself (Surface):} Determining the type of
+    surface the user is riding on to assess if the vehicle is adequate
+    and the ride will be physically comfortable.
+  \item \textbf{The obstacles along the route (Traffic Dynamics):}
+    Evaluating whether traffic is dominated by other bicycles or cars,
+    and identifying major crossings to determine if the ride can
+    remain largely continuous.
+  \item \textbf{The surroundings (Environment):} Recognizing whether
+    the route is dominated by cluttered cityscapes or greenery, and
+    detecting natural features like forests and rivers to assess if
+    the route is enjoyable rather than just a functional commute.
+\end{itemize}
+
+These three factors are defined as our target sub-functions, 
+as each contributes differently to the riding experience and operates under distinct dynamics. 
+Consequently, each task required a dedicated approach, 
+making it essential to select models specifically suited to each sub-function. 
+Similarly, dataset annotation and labeling were tailored to the specific demands of each individual task.
+The following sections explain the methodology for selecting, analyzing, and adapting these individual models. 
+The final section details how the overall score is calculated from the combined outputs of each pipeline.
+
+
 \section{Research Approach and Methodology}
 % --- NOTE: This section will be written later. ---
 
@@ -177,12 +223,104 @@ Cycleway/Road pair and the rare Gravel/Unpaved classes.}
 \end{figure}
 
 % =====================================================================
-% PAGE 3 -- OBJECT DETECTION (not Bünyamin -- heading only)
+% PAGE 3 -- OBJECT DETECTION (Gonzalo-- heading only)
 % =====================================================================
 
 \clearpage
 \section{Object Detection}
 % --- NOTE: This section will be written later. ---
+
+\subsection{Technical Scope}
+For the object recognition module, the methodology focuses specifically
+on counting objects.
+This design choice was made because objects move relative to the bike
+rider regardless of their absolute speed, as the rider is in continuous
+motion.
+Consequently, an object's size within the field of view changes frame
+by frame and cannot serve as a stable factor for calculations.
+
+This dynamic property led to another design consideration regarding the
+scope of the \enquote{bikeability score} evaluator: evaluating the
+exact same route will yield slightly different results depending on
+the specific time the footage is captured.
+For this algorithm to be viable in a mass-market product, it must be
+capable of running in real time on an edge device mounted on the
+bicycle.
+This strict real-time requirement applies to the dynamic object
+detection, but not to the other two static sub-scores.
+
+\subsection{Performance Trade-offs}
+Therefore, the primary selection parameters for this specific task are
+the model's inference time and its overall size, which are inherently
+related.
+Because larger models can extract more complex image features, there
+is a direct trade-off between inference time and accuracy, requiring
+us to find an optimal balance for our model selection.
+
+These runtime criteria, combined with the fact that this module only
+requires object recognition, led directly to targeting the YOLO family
+of models as the most suitable candidates for the task.
+However, it remains necessary to benchmark different generations and
+sizes of YOLO models to determine the most effective configuration.
+
+\subsection{Object Classes}
+For the calculation of the score, the methodology restricts the
+categories of relevant objects.
+Rather than defining new categories from scratch, the project utilizes
+widely accepted object set categorizations.
+Because the system employs a pre-trained YOLO model, it is more
+efficient to leverage its baseline capabilities before resorting to
+custom retraining.
+Consequently, the COCO dataset convention was selected as the primary
+starting point, though Mapillary remains a viable alternative dataset
+for future iterations.
+
+The COCO dataset classifies detected objects into 80 distinct
+categories, not all of which are relevant to traffic environments.
+Therefore, the relevant classes were grouped into three primary
+subsets (Table~\ref{tab:coco_subsets}).
+
+\begin{table}[H]
+\caption{Grouping of relevant COCO object classes into traffic-related
+categories.}
+\label{tab:coco_subsets}
+\centering
+\small
+\begin{tabular}{@{}lp{4.8cm}@{}}
+\toprule
+\textbf{Category} & \textbf{COCO Object Classes}\\
+\midrule
+Motor vehicles & car, truck, bus, motorcycle\\
+Other road users & person, bicycle\\
+Traffic infrastructure & traffic light, stop sign, parking meter,
+  fire hydrant, bench\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+From these subsets, three representative classes were selected:
+\textbf{car}, \textbf{bicycle}, and \textbf{traffic light}.
+
+To ensure accurate labeling within the reference dataset, it is
+necessary to strictly define the boundaries and potential edge cases
+for the target classes (Table~\ref{tab:object_classes}).
+
+\begin{table}[H]
+\caption{Class boundary definitions for the object detector.}
+\label{tab:object_classes}
+\centering
+\small
+\begin{tabular}{@{}p{1.5cm}p{2.7cm}p{2.7cm}@{}}
+\toprule
+\textbf{Class} & \textbf{IS} & \textbf{IS NOT}\\
+\midrule
+Bicycle & Road bike, mountain bike, city bike, BMX, bicycle w/rider
+  & Motorcycle, motor scooter\\
+Car & Sedan, hatchback, wagon, coupe, SUV, crossover, minivan
+  & Bus, truck, train\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % =====================================================================
 % PAGE 4 -- ENVIRONMENT DETECTION (not Bünyamin -- heading only)
