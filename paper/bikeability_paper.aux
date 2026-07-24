@@ -1,0 +1,63 @@
+\relax 
+\providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
+\@nameuse{bbl@beforestart}
+\babel@aux{english}{}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {II}Research Approach and Methodology}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Objectives and Constraints}{1}{}\protected@file@percent }
+\citation{clip}
+\citation{openclip}
+\citation{datacomp}
+\citation{siglip}
+\citation{mobileclip}
+\citation{evaclip}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Road-Surface Classification}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Task Definition and Model Selection}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Surface Classes and Prompts}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Evaluation Protocol}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Results}{2}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Zero-shot surface-classification benchmark on the self-labeled test set ($>\!1{,}700$ frames), sorted by macro-F1. BAcc: balanced accuracy; latency at batch size~1.}}{2}{}\protected@file@percent }
+\newlabel{tab:ground_results}{{I}{2}{}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Row-normalized confusion matrix of the best model (OpenCLIP ViT-B/32, LAION-2B) on the labeled test set. Each cell shows the count and the row share; the diagonal is correct. Errors concentrate on the Cycleway/Road pair and the rare Gravel/Unpaved classes.}}{2}{}\protected@file@percent }
+\newlabel{fig:confusion}{{1}{2}{}{figure.1}{}}
+\citation{coco}
+\citation{mapillaryvistas}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Object Detection}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Technical Scope}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Performance Trade-offs}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Object Classes}{3}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Grouping of relevant COCO object classes into traffic-related categories.}}{3}{}\protected@file@percent }
+\newlabel{tab:coco_subsets}{{II}{3}{}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Class boundary definitions for the object detector.}}{3}{}\protected@file@percent }
+\newlabel{tab:object_classes}{{III}{3}{}{table.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Environment Detection}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Computation of the Bikeability Score}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Detector Outputs as Vectors}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Overall Formula}{5}{}\protected@file@percent }
+\newlabel{eq:score}{{1}{5}{}{equation.1}{}}
+\newlabel{eq:weights}{{2}{5}{}{equation.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Ground Sub-Score}{5}{}\protected@file@percent }
+\newlabel{eq:ground}{{3}{5}{}{equation.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-D}}Environment Sub-Score}{5}{}\protected@file@percent }
+\newlabel{eq:env}{{4}{5}{}{equation.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-E}}Object Sub-Score}{5}{}\protected@file@percent }
+\newlabel{eq:object}{{5}{5}{}{equation.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Class value vectors for the three sub-scores: surface quality $\mathbf  {q}^{g}$, environment quality $\mathbf  {q}^{e}$, and object weight $\boldsymbol  {\lambda }$ (heuristic; a negative value acts as a bonus).}}{5}{}\protected@file@percent }
+\newlabel{tab:quality}{{IV}{5}{}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-F}}GPX Mapping and Visualization}{5}{}\protected@file@percent }
+\bibstyle{IEEEtran}
+\bibdata{references}
+\bibcite{clip}{1}
+\bibcite{openclip}{2}
+\bibcite{datacomp}{3}
+\bibcite{siglip}{4}
+\bibcite{mobileclip}{5}
+\bibcite{evaclip}{6}
+\bibcite{coco}{7}
+\bibcite{mapillaryvistas}{8}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Bikeability score colored along the GPX route (red $=$ low, green $=$ high). Per-frame scores are matched to the nearest GPS track point via a manual sync point; the example ride has a mean score of $\bar  {A}\approx 85.7/100$.}}{6}{}\protected@file@percent }
+\newlabel{fig:route}{{2}{6}{}{figure.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Discussion}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IX}Conclusion}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
+\gdef \@abspage@last{6}
