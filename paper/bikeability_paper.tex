@@ -243,7 +243,7 @@ Cycleway/Road pair and the rare Gravel/Unpaved classes.}
 \end{figure}
 
 % =====================================================================
-% PAGE 3 -- OBJECT DETECTION (Gonzalo-- heading only)
+% PAGE 3 -- OBJECT DETECTION (Gonzalo Guerrero)
 % =====================================================================
 
 \clearpage
@@ -282,6 +282,21 @@ requires object recognition, led directly to targeting the YOLO family
 of models as the most suitable candidates for the task.
 However, it remains necessary to benchmark different generations and
 sizes of YOLO models to determine the most effective configuration.
+
+\begin{figure}[!h]
+\centering
+\subfloat[]{%
+\includegraphics[width=0.48\columnwidth]{images/yolo_speed_accu.png}%
+\label{fig:yolo_speed_accuracy}}
+\hfill
+\subfloat[]{%
+\includegraphics[width=0.48\columnwidth]{images/yolo_bench_threshold.png}%
+\label{fig:yolo_confidence}}
+\caption{YOLO model comparison for the object-detection module.
+(a) Inference speed vs.\ macro MAE across YOLO variants.
+(b) Macro MAE vs.\ confidence threshold per model.}
+\label{fig:yolo_comparison}
+\end{figure}
 
 \subsection{Object Classes}
 For the calculation of the score, the methodology restricts the
