@@ -39,7 +39,7 @@ research/dataset/external/
 
 research/models/_tmp_experiments/
 
-
+dataset/
 research/dataset/training/*
 !research/dataset/training/manifest.csv
 

@@ -221,9 +221,8 @@ ensembling}~\cite{clip} over 6--8 templates per class ($+0.044$); larger capacit
 exposed CLIP's apparent water strength as a small-validation artifact.
 
 \begin{table}[H]
-\caption{CLIP zero-shot optimization: chronological own-test macro-F1. C1--C6 are
-pre-water; C7 adds the water rides (basis change), where CLIP's water proves an
-artifact. Final: ViT-B/32, prompt ensembling.}
+\caption{CLIP zero-shot optimization steps: C1--C6 are
+pre-water; C7 adds the water rides. Final: ViT-B/32, prompt ensembling.}
 \label{tab:clip-opt}
 \centering
 \scriptsize
@@ -256,8 +255,7 @@ $+0.027$.
 
 \begin{table}[H]
 \caption{SegFormer optimization in two phases: \emph{training} on Mapillary pixel masks
-(mIoU, dev set), then \emph{evaluation} on own frames (macro-F1), ending on the unseen
-water-inclusive test. Final: B0 ADE20K base, 3~classes $+$ ``other''.}
+(mIoU, dev set), then \emph{evaluation} on own frames (macro-F1).}
 \label{tab:seg-opt}
 \centering
 \scriptsize
