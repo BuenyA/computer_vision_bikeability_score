@@ -25,20 +25,13 @@
 
 \author{Bünyamin~Aydemir,
         Gonzalo~Guerrero~Salazar,
-        and~Hendrick~Fischer% <-this % stops a space
-\thanks{Manuscript created July 2026. The authors are students at the
-Baden-Württemberg Cooperative State University (DHBW) within the
-Computer Vision course.}}
+        and~Hendrick~Fischer}
 
 % The paper headers
 \markboth{Computer Vision -- Project Work, DHBW, 2026}%
 {Aydemir \MakeLowercase{\textit{et al.}}: A Computer-Vision-Based Bikeability Score}
 
 \maketitle
-
-\begin{abstract}
-% --- NOTE: This section will be written later (part of page 1). ---
-\end{abstract}
 
 \begin{IEEEkeywords}
 Bikeability, computer vision, zero-shot classification, vision-language models,
@@ -47,7 +40,7 @@ CLIP, surface classification, object detection, GPX.
 
 % =====================================================================
 % PAGE 1 -- Introduction, research approach/methodology, objectives,
-% constraints (to be written later, headings only here)
+% constraints (All Authors)
 % =====================================================================
 
 \section{Introduction}
@@ -320,7 +313,7 @@ macro Mean Absolute Error (MAE) than YOLO26s with comparable or faster inference
 maintaining this margin across most confidence thresholds
 (Fig.~\ref{fig:yolo_comparison}\subref{fig:yolo_speed_accuracy}).
 
-\begin{figure}[!t]
+\begin{figure}[!b]
 \centering
 \subfloat[]{%
 \includegraphics[width=0.48\columnwidth]{images/yolo_speed_accu.png}%
@@ -335,7 +328,7 @@ maintaining this margin across most confidence thresholds
 \label{fig:yolo_comparison}
 \end{figure}
 
-Larger variants offer higher overall accuracy, but double the inference time. 
+Larger variants offer higher overall accuracy, but double the inference time.
 Model scaling carries a cost: stepping from nano to medium increases parameters 
 eightfold ($\sim$3.2\,M to $\sim$25.9\,M) and compute nearly tenfold (8.7 to 78.9\,GFLOPs).  
 This kind of analysis is habitual in edge deployment scenarios \cite{yolo_embedded}, 
@@ -354,17 +347,7 @@ be picked for the target application. For our data, YOLO11s achieves its
 best performance at approximately 0.20.
 
 \subsection{Dataset Distribution and Bounding Box Analysis}
-The distribution of detected objects was analyzed to understand the 
-data and evaluate the suitability of the chosen model. YOLO26x was used 
-as a teacher model to provide bounding boxes across all frames. It was shown 
-that cars represent the most frequent object class, while bicycles are 
-sparser and more challenging to detect. Detections cluster along the road surface, 
-and around the horizontal center of the image  (roughly $x = 0.40$ to $0.65$) 
-at mid-to-lower frame height ($y \approx 0.45$ to $0.65$), exhibiting 
-increasing density with two hotspots near the vanishing point 
-(Fig.~\ref{fig:bike_distribution}\subref{fig:bike_heatmap}).
-
-\begin{figure}[!t]
+\begin{figure}[!b]
 \centering
 \subfloat[]{%
 \includegraphics[width=0.48\columnwidth]{images/detection_heatmap.png}%
@@ -378,8 +361,17 @@ increasing density with two hotspots near the vanishing point
 (b) Histogram of detected bounding box heights in pixels.}
 \label{fig:bike_distribution}
 \end{figure}
+The distribution of detected objects was analyzed to understand the 
+data and evaluate the suitability of the chosen model. YOLO26x was used 
+as a teacher model to provide bounding boxes across all frames. It was shown 
+that cars represent the most frequent object class, while bicycles are 
+sparser and more challenging to detect. Detections cluster along the road surface, 
+and around the horizontal center of the image  (roughly $x = 0.40$ to $0.65$) 
+at mid-to-lower frame height ($y \approx 0.45$ to $0.65$), exhibiting 
+increasing density with two hotspots near the vanishing point 
+(Fig.~\ref{fig:bike_distribution}\subref{fig:bike_heatmap}).
 
-Object size correlates with distance, making farther objects 
+Object size correlates with distance, making farther objects
 harder to detect. Bicycles represent the most difficult category due to its relative
 scarcity, making their size distribution particularly relevant.
 Across 1001 evaluated frames, 565 raw bicycle detections were recorded,
@@ -394,8 +386,9 @@ and the MAE increased to 0.15.
 These results directly support the hypothesis and hint that excessive downscaling would erroneously
 eliminate detections.
 
+
 % =====================================================================
-% PAGE 4 -- ENVIRONMENT DETECTION (not Bünyamin -- heading only)
+% PAGE 4 -- ENVIRONMENT DETECTION (Hendrick Fischer)
 % =====================================================================
 
 \clearpage
@@ -527,52 +520,49 @@ missed) is capped by data scarcity, fixable only with more in-domain water.
 \setlength{\intextsep}{3pt}%
 
 % =====================================================================
-% PAGE 5 -- BIKEABILITY SCORE (Bünyamin Aydemir)
+% PAGE 5 -- BIKEABILITY SCORE (All Authors)
 % =====================================================================
 
 \clearpage
 \section{Computation of the Bikeability Score}
 \label{sec:score}
 
-The bikeability score fuses the three detector outputs into a single value in
-$[0,100]$: the one-hot surface vector $\mathbf{g}$, environment area fractions
-$\mathbf{f}$, and object counts $\mathbf{n}$ are each mapped to a \emph{sub-score}
-in $[0,1]$ via a stored value vector (Table~\ref{tab:quality}), then combined by a
-weighted mean.
+The score fuses the three detector outputs -- one-hot surface $\mathbf{g}$,
+environment area fractions $\mathbf{f}$, object counts $\mathbf{n}$ -- into a single
+value in $[0,100]$: each is mapped to a \emph{sub-score} in $[0,1]$ via a stored
+value vector (Table~\ref{tab:quality}), then combined by a weighted mean.
 
 \subsection{Overall Formula}
-For each evaluated frame, the score $A$ results from the weighted mean
-of the three sub-scores:
-\begin{equation}
-\label{eq:score}
-A = 100 \cdot \Big( w_g \, S_{\text{ground}}
-                  + w_e \, S_{\text{env}}
-                  + w_o \, S_{\text{object}} \Big),
-\end{equation}
-with the weights
+For each evaluated frame, the score $A$ is the weighted mean of the three sub-scores:
 \begin{equation}
 \label{eq:weights}
-w_g = 0.20, \quad w_e = 0.45, \quad w_o = 0.35.
+A = 100 \big( w_g S_{\text{ground}} + w_e S_{\text{env}} + w_o S_{\text{object}} \big),
 \end{equation}
-The weights are heuristic: environment and object exposure dominate how a stretch
-feels and take the larger share ($w_e+w_o=0.80$), while surface --- which varies
-little and is the least reliable detector (macro-F1 $0.58$) --- takes the smallest
-($w_g=0.20$). As all sub-scores lie in $[0,1]$ and the weights sum to $1$,
-$A\in[0,100]$.
+with $(w_g,w_e,w_o) = (0.20,\,0.45,\,0.35)$. The weights are heuristic: environment
+and object exposure dominate how a stretch feels ($w_e+w_o=0.80$), while surface ---
+which varies little and is the least reliable detector (macro-F1 $0.58$) --- takes the
+smallest share. Sub-scores in $[0,1]$ and weights summing to $1$ bound $A$ to
+$[0,100]$.
+
+\begin{figure}[!b]
+\centering
+\includegraphics[width=0.55\columnwidth]{images/bikeability_map.png}
+\caption{Bikeability score along the GPX route (red $=$ low, green $=$ high;
+mean $\bar{A}\approx 85.7/100$).}
+\label{fig:route}
+\end{figure}
 
 \subsection{Sub-Scores}
-Each detector output maps to a sub-score in $[0,1]$ via the value vectors of
-Table~\ref{tab:quality}, summarised in Table~\ref{tab:subscores}.
+Each output maps to a sub-score via the value vectors of Table~\ref{tab:quality},
+summarised in Table~\ref{tab:subscores}.
 
 \begin{table}[H]
-\caption{Per-frame sub-score formulas. The detector outputs are $\mathbf{g}$
-(one-hot surface), $\mathbf{f}$ (environment area fractions) and $\mathbf{n}$
-(object counts); $\mathbf{q}^{g},\mathbf{q}^{e},\boldsymbol{\lambda}$ are the value
-vectors of Table~\ref{tab:quality} and
-$\rho=\langle\mathbf{n},\boldsymbol{\lambda}\rangle$.}
+\caption{Per-frame sub-score formulas;
+$\mathbf{q}^{g},\mathbf{q}^{e},\boldsymbol{\lambda}$ are the value vectors of
+Table~\ref{tab:quality} and $\rho=\langle\mathbf{n},\boldsymbol{\lambda}\rangle$.}
 \label{tab:subscores}
 \centering
-\renewcommand{\arraystretch}{1.25}
+\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{@{}ll@{}}
 \toprule
 \textbf{Sub-score} & \textbf{Formula}\\
@@ -584,21 +574,12 @@ Object & $S_{\text{object}} = \exp\!\big(-\max(\rho,0)\big)$\\
 \end{tabular}
 \end{table}
 
-\noindent The formulas tie to the detector outputs: \textbf{Ground} (one-hot) selects
-the surface's quality; \textbf{Environment} is a fraction-weighted mean (normalised by
-$\sum_k f_k$, $0.5$ if empty) rewarding scenery coverage; \textbf{Object} clamps $\rho$
-so cars ($+1.0$) and traffic lights ($+0.3$) lower the score, bicycles ($-0.2$) only
-offset them, never lifting it above~$1.0$.
+\noindent \textbf{Ground} (one-hot) selects the surface's quality;
+\textbf{Environment} is a fraction-weighted mean rewarding scenery coverage;
+\textbf{Object} clamps $\rho$ so cars ($+1.0$) and traffic lights ($+0.3$) lower the
+score, while bicycles ($-0.2$) only offset them, never lifting it above~$1.0$.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\columnwidth]{images/bikeability_map.png}
-\caption{Bikeability score along the GPX route (red $=$ low, green $=$ high;
-mean $\bar{A}\approx 85.7/100$).}
-\label{fig:route}
-\end{figure}
 
-\newpage
 \subsection{GPX Mapping and Visualization}
 Each frame is matched to its nearest GPX track point (nearest-neighbor join, $3$\,s
 tolerance, one manual sync point), giving every score a location. The route average
@@ -611,13 +592,13 @@ green with a few yellow/orange sections.
 % =====================================================================
 
 \section{Conclusion}
-We presented a pipeline that turns forward-facing cycling video into a bikeability score
-in $[0,100]$ from three detectors: \emph{surface} (training-free OpenCLIP ViT-B/32,
-macro-F1 $0.58$), \emph{objects} (YOLO11s, beating the newer YOLO26 at equal scale), and
-\emph{environment} (fine-tuned SegFormer over zero-shot CLIP, $0.704$ vs.\ $0.649$,
-winning the rare \emph{water} class on precision and feeding the score's area fractions).
-Water recall (scarce in-domain data) is the main limit; the next step is pixel-masked
-in-domain water frames and validation against human ratings.
+We presented a pipeline that turns forward-facing cycling video into a bikeability
+score in $[0,100]$ from three detectors: \emph{surface} (training-free OpenCLIP
+ViT-B/32, macro-F1 $0.58$), \emph{objects} (YOLO11s, beating the newer YOLO26 at equal
+scale) and \emph{environment} (fine-tuned SegFormer over zero-shot CLIP, $0.704$ vs.\
+$0.649$, winning the rare \emph{water} class on precision). Water recall (scarce
+in-domain data) is the main limit; next are pixel-masked water frames and validation
+against human ratings.
 
 % =====================================================================
 % Bibliography
