@@ -47,36 +47,16 @@ G.~Jocher, J.~Qiu, M.~Liu, S.~Lyu, F.~C. Akyon, and M.~E. Kalfaoglu, ``{Ultralyt
 \bibitem{yolo_embedded}
 P.~Mart\'inez~Otero, A.~Tellaeche, and M.~Hern\'andez~Melero, ``Performance analysis of the {YOLO} object detection algorithm in embedded systems: Generated code vs.\ native implementation,'' \emph{Computation}, vol.~14, no.~3, p.~67, Mar. 2026.
 
-\bibitem{urbanclip}
-W.~Huang, J.~Wang, and G.~Cong, ``Zero-shot urban function inference with
-  street view images through prompting a pretrained vision-language model,''
-  \emph{Int. J. Geographical Information Science (IJGIS)}, vol.~38, no.~7, pp.
-  1414--1442, 2024.
-
 \bibitem{segformer}
-E.~Xie, W.~Wang, Z.~Yu, A.~Anandkumar, J.~M. Alvarez, and P.~Luo,
-  ``{SegFormer}: Simple and efficient design for semantic segmentation with
-  transformers,'' in \emph{Proc. Advances in Neural Information Processing
-  Systems (NeurIPS)}, 2021, pp. 12\,077--12\,090.
-
-\bibitem{greenery}
-D.~H. Lee, H.~Y. Park, and J.~Lee, ``A review on recent deep learning-based
-  semantic segmentation for urban greenness measurement,'' \emph{Sensors},
-  vol.~24, no.~7, p. 2245, 2024.
+E.~Xie, W.~Wang, Z.~Yu, A.~Anandkumar, J.~M. Alvarez, and P.~Luo, ``{SegFormer}: Simple and efficient design for semantic segmentation with transformers,'' in \emph{Proc. Advances in Neural Information Processing Systems (NeurIPS)}, 2021, pp. 12\,077--12\,090.
 
 \bibitem{mapillaryvistas}
-G.~Neuhold, T.~Ollmann, S.~Rota~Bul\`o, and P.~Kontschieder, ``The {Mapillary
-  Vistas} dataset for semantic understanding of street scenes,'' in \emph{Proc.
-  IEEE Int. Conf. Computer Vision (ICCV)}, 2017, pp. 4990--4999.
+G.~Neuhold, T.~Ollmann, S.~Rota~Bul{\`o}, and P.~Kontschieder, ``The {Mapillary Vistas} dataset for semantic understanding of street scenes,'' in \emph{Proc. IEEE Int. Conf. Comput. Vis. (ICCV)}, 2017, pp. 5000--5009.
 
 \bibitem{ade20k}
-B.~Zhou, H.~Zhao, X.~Puig, T.~Xiao, S.~Fidler, A.~Barriuso, and A.~Torralba,
-  ``Semantic understanding of scenes through the {ADE20K} dataset,'' \emph{Int.
-  J. Computer Vision (IJCV)}, vol. 127, no.~3, pp. 302--321, 2019.
+B.~Zhou, H.~Zhao, X.~Puig, T.~Xiao, S.~Fidler, A.~Barriuso, and A.~Torralba, ``Semantic understanding of scenes through the {ADE20K} dataset,'' \emph{Int. J. Computer Vision (IJCV)}, vol. 127, no.~3, pp. 302--321, 2019.
 
 \bibitem{ftsegformer}
-T.~Cornille and N.~Rogge, ``Fine-tune a semantic segmentation model with a
-  custom dataset,'' Hugging Face Blog, 2022,
-  \url{https://huggingface.co/blog/fine-tune-segformer}.
+T.~Cornille and N.~Rogge, ``Fine-tune a semantic segmentation model with a custom dataset,'' Hugging Face Blog, 2022, \url{https://huggingface.co/blog/fine-tune-segformer}.
 
 \end{thebibliography}
